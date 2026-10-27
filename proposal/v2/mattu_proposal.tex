@@ -1,0 +1,97 @@
+\documentclass[conference,10pt]{IEEEtran}
+% DSCI-650 project proposal, revised for readability (v2). IEEE conference template, unmodified.
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\RQ}[1]{\textbf{RQ#1}}
+\newcommand{\hy}[1]{\textbf{H#1}}
+
+\begin{document}
+
+\title{Which Phase to Slow Down? Software-Only Power Reduction for LLM Serving with Separate Prefill and Decode GPUs}
+
+\author{\IEEEauthorblockN{Karthik Mattu}
+\IEEEauthorblockA{MS Artificial Intelligence, Rochester Institute of Technology --- km5503@rit.edu\\DSCI-650 High Performance Data Science, Fall 2026}}
+
+\maketitle
+
+\begin{abstract}
+Electric utilities can connect a new AI data center years sooner if it agrees to reduce its power draw during the few hours a year when the grid is under stress. The cluster operator then has to decide which part of the workload to slow down, how quickly power drops, and how much users notice. Existing work on the energy use of large language model (LLM) inference mostly lowers average energy with GPU frequency scaling and hardware power caps, which need administrator access, and it does not measure a temporary reduction. I propose to measure one on an LLM serving system where the two phases of inference, prompt processing (prefill) and token generation (decode), run on separate GPUs. An MPI controller will apply four software-only controls, such as pausing new requests, to each GPU during replayed grid stress events. On two NVIDIA A100 GPUs with public Azure request traces, I will report power, energy per token, latency, and the latency added per watt saved, against a standard two-GPU deployment and a run with no control.
+\end{abstract}
+
+\section{Introduction and Motivation}
+New AI data centers face long waits for a grid connection. A utility must be able to supply a facility's highest possible power draw, and in congested regions the power lines and generation for that take seven to ten years to build~\cite{norris2025rethinking}. That peak is rarely reached. Norris et al.\ estimate that the 22 largest US grid regions could connect 76--126\,GW of new load on existing capacity if that load reduced its draw during 0.25--1\% of hours~\cite{norris2025rethinking}. Some utilities now offer this arrangement, called \emph{flexible interconnection}: the data center is connected early and in return reduces power when the utility asks (a \emph{grid stress event}). In a 2025 Phoenix trial, a 256-GPU cluster cut its power by 25\% for three hours at a utility's request~\cite{colangelo2025phoenix}.
+
+For LLM serving, delivering that reduction is a distributed-systems problem: several GPU processes with different bottlenecks share one power budget. An LLM answers a request in two phases~\cite{patel2024splitwise}. \emph{Prefill} reads the whole prompt in one pass and is limited by GPU compute. \emph{Decode} then produces the answer one token at a time and is limited by memory bandwidth, because every step reads all of the model's weights. Prefill sets the time to first token (TTFT) and decode sets the time per output token (TPOT). Recent serving systems run the two phases on separate GPUs~\cite{zhong2024distserve,qin2025mooncake}. The prefill GPU saves its result, called the key-value (KV) cache, and copies it to the decode GPU. With this split an operator can choose which phase to slow down. The split also adds a communication cost (the KV cache copy) and a coordination problem between two GPUs under one budget.
+
+In my preliminary measurements on one A100, prefill drew about 230\,W and hit the GPU's power limit 90\% of the time, while decode drew about 200\,W and never hit it. I use only controls that need no administrator rights, because a user of a shared cluster cannot change GPU frequency or power caps. Expected contributions:
+\begin{itemize}
+\item Curves of power, TTFT and TPOT against request rate for the prefill GPU and the decode GPU. I expect that pausing new requests removes at least 70\% of prefill GPU power within 5\,s.
+\item Measurements of four software-only controls on each GPU during replayed grid stress events: size of the power reduction, time to reach it, recovery time, and overshoot.
+\item A ranking of the control and GPU combinations by latency added per watt saved, compared against two baselines and released with code and data.
+\end{itemize}
+
+\section{Related Work}
+\textbf{Data centers as flexible grid loads.} Grid studies agree on what a utility wants: a power reduction of known size for a small share of the year~\cite{norris2025rethinking,khanal2026shift}. Early demand-response work treats the data center as a single load and gets the reduction by delaying batch jobs~\cite{wierman2014dcdr,liu2013dcdr,lin2023adapting}. That fails for interactive LLM inference, where a user is waiting. Later work reduces power on real AI clusters: Acun et al.~\cite{acun2026flexdc} on training jobs, and the Emerald AI trials~\cite{colangelo2025phoenix,williams2026powerflex} on a production site. The Emerald reports include a single data point for LLM serving and list inference latency targets as open. None of these studies controls anything inside the serving software.
+
+\textbf{Power control inside the data center.} Fleet-level systems~\cite{wu2016dynamo,li2020thunderbolt,patel2024polca} rely on hardware power caps and treat latency-sensitive services such as inference as something to protect. They ask how much capping is safe, not how to reduce inference power on request. LLM energy work does target inference: DynamoLLM~\cite{stojkovic2025dynamollm}, VoltanaLLM~\cite{yu2026voltana} and related systems~\cite{qiu2024userve,kakolyris2024slo,dualscale2026,rapid2026} use the difference between prefill and decode to tune GPU frequency, placement and routing, either to lower average energy or to meet latency targets under a fixed power budget. All need administrator control of GPU frequency. None tests a power limit that changes over time, or reports what happens after the limit is lifted.
+
+\textbf{Separating prefill and decode.} DistServe~\cite{zhong2024distserve} and Splitwise~\cite{patel2024splitwise} put the two phases on separate GPUs so they stop slowing each other down, at the cost of copying the KV cache. Only this design gives two groups of GPUs whose power can be reduced independently. For measurement I follow Zeus~\cite{you2023zeus} and TokenPowerBench~\cite{niu2026tokenpowerbench}, and I can check my data against SweetSpot's steady-state energy model~\cite{cavagna2026sweetspot}.
+
+\textbf{Gap.} No study takes a serving system with separate prefill and decode GPUs, applies software-only controls to each phase during a temporary power reduction, and reports the result in the terms a utility uses (size, speed, recovery). This project does.
+
+\section{Research Questions and Hypotheses}
+\RQ{1} How much power can each GPU give up using software-only controls, and how quickly? \hy{1}: pausing new requests removes at least 70\% of prefill GPU power and 60\% of decode GPU power within 5\,s. Limiting concurrency lowers energy per token but changes average power by less than 10\%.
+
+\RQ{2} What does separating the phases cost in communication, and does it make power reduction cheaper? \hy{2}: the cost of the KV cache copy comes from per-request coordination, not link bandwidth. In my first test a 180-token prompt produced about 5\,MB of KV cache, under 1\,ms of PCIe transfer, yet median TTFT rose by 34\,ms. So its share of TTFT should shrink for longer prompts. I also expect the separated deployment to save at least 1.5$\times$ the watts of a standard deployment for the same latency penalty.
+
+\RQ{3} During a replayed grid stress event, which control on which GPU adds the least latency per watt saved, and does power overshoot afterwards? \hy{3}: for the same power reduction, controls on the prefill GPU add less TTFT per watt than controls on the decode GPU add TPOT per watt. After the event, power stays at least 10\% above its earlier average for at least 30\,s.
+
+\section{Proposed Approach}
+\textbf{System.} Two instances of vLLM~\cite{kwon2023vllm} 0.28, an open-source LLM server, run on one node: prefill on GPU\,0 and decode on GPU\,1. vLLM's NIXL connector copies the KV cache between them over PCIe using the UCX library. A proxy routes each request through both. The work is decomposed by phase into a two-stage pipeline across processes, and the data passed between stages is the KV cache: about 28\,KB per prompt token for a 1.5B-parameter model and twice that at 7B.
+
+\textbf{Controller (MPI, C++).} Rank~0 is the controller. It turns a recorded grid stress event into a power budget over time and sends control commands with non-blocking \texttt{MPI\_Isend}. Ranks 1 and 2 each manage one GPU. In each, a sampler thread reads power, clock frequency and throttling status from NVIDIA's NVML library 20 times per second, while the main thread reads the GPU's energy counter and applies commands through the serving API. \texttt{MPI\_Allreduce} sums power across GPUs, \texttt{MPI\_Gather} collects the samples for each measurement window, and \texttt{MPI\_Barrier} lines up the window start on both GPUs.
+
+\textbf{Load generator (C++ threads).} One thread per request stream uses libcurl to send requests at the arrival times recorded in the trace, without waiting for earlier responses. Requests are tagged high or low priority.
+
+\textbf{Controls.} Four per GPU: (1)~pause new requests while running ones finish; (2)~limit how many requests run at once; (3)~drop low-priority requests; (4)~empty the GPU and hold it idle with the model loaded. Load balancing is the ratio of prefill to decode GPUs, fixed at 1:1 here.
+
+\section{Evaluation Plan}
+\textbf{Baselines.} (B1) Standard vLLM with the model spread over both GPUs by tensor parallelism. (B2) The separated deployment with no control during the event. (B3) The separated deployment with both GPUs throttled equally.
+
+\textbf{Metrics.} Mean and peak power per GPU; energy per token by phase; median and 99th-percentile TTFT and TPOT; requests meeting their latency targets; KV copy overhead; size, ramp time, recovery and overshoot of each reduction; latency added per watt saved.
+
+\textbf{Workloads.} Request arrival times and lengths come from the public Azure LLM inference traces (coding and conversation, about 20k requests each~\cite{patel2024splitwise}). Grid stress events are sampled from 12{,}840 stress hours in five years of hourly CAISO and PJM data.
+
+\textbf{Hardware.} RIT Research Computing: one Slurm node with two A100 PCIe 40\,GB GPUs. Qwen2.5 1.5B for parameter sweeps and the 7B model for final runs.
+
+\textbf{Method.} Three repetitions per point, 95\% confidence intervals, and every measurement window started at a GPU temperature of 45\,$^\circ$C or below. Experiment $n$ in Table~\ref{tab:timeline} answers RQ$n$.
+
+\section{Timeline, Roles, and Risks}
+\begin{table}[!h]
+\centering\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Weeks & Milestone & Deliverable\\
+\midrule
+4 & Two-GPU setup tested (done); proposal & proposal\\
+5--6 & Exp.\ 1: probe, load generator, rate sweeps & Update I\\
+7--8 & Exp.\ 2: MPI controller; separated vs.\ B1 & first curves\\
+9--10 & Exp.\ 3: replayed events, all controls & ranking table\\
+11--14 & Exp.\ 1 and 3 on 7B; paper (ICPE format) & Update II, paper\\
+\bottomrule
+\end{tabular}
+\caption{Milestones for this single-author project (week 1 = 24 Aug 2026).}\label{tab:timeline}
+\end{table}
+
+\textbf{Risks.} (1) Nodes on RIT's cluster differ in how the two GPUs attach to the CPUs, which changes KV copy time. I will pin runs to one node (Slurm \texttt{-{}-nodelist}) and report the layout; file-based KV transfer and Ray Serve are fallbacks. (2) Queue waits: my single-GPU prototype already works, so data collection does not wait on the C++ code.
+
+\section{Target Venue}
+Primary: ICPE (ACM/SPEC Int'l Conference on Performance Engineering, CORE B), which recently published LLM inference energy modeling~\cite{cavagna2026sweetspot} and transformer resource-efficiency work~\cite{wallace2025icpe}. Backup: IEEE/ACM CCGrid (CORE B).
+
+\bibliographystyle{IEEEtran}
+\bibliography{mattu_proposal}
+\end{document}

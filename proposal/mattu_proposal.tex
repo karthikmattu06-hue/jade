@@ -1,0 +1,92 @@
+\documentclass[conference,10pt]{IEEEtran}
+% DSCI-650 project proposal -- IEEE conference template, unmodified margins/fonts/spacing.
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\RQ}[1]{\textbf{RQ#1}}
+\newcommand{\hy}[1]{\textbf{H#1}}
+
+\begin{document}
+
+\title{Which Phase to Shed? Unprivileged Power Flexibility of Prefill/Decode-Disaggregated LLM Serving under Grid Events}
+
+\author{\IEEEauthorblockN{Karthik Mattu}
+\IEEEauthorblockA{MS Artificial Intelligence, Rochester Institute of Technology --- km5503@rit.edu\\DSCI-650 High Performance Data Science, Fall 2026}}
+
+\maketitle
+
+\begin{abstract}
+AI data centers now wait years for grid connections sized to their peak draw. Flexible interconnection---connect sooner in exchange for shedding load when the grid is stressed---is the way around the queue, and it moves the burden onto whoever runs the cluster: which component to throttle, how fast the reduction arrives, and what it costs users. Prior work optimizes steady-state energy with privileged knobs---frequency scaling, power caps---that tenants cannot touch, and none measures the transient response an event demands: depth, ramp, recovery, rebound. We measure that response on a prefill/decode-disaggregated vLLM deployment whose compute-bound and bandwidth-bound phases run on separate GPUs and exchange KV caches over PCIe. An MPI controller drives four software-only levers per pool under replayed grid events; on two A100s with public Azure traces we report power, energy per token, tail latency, KV-transfer overhead, and QoS cost per watt shed against monolithic tensor-parallel and no-control baselines.
+\end{abstract}
+
+\section{Introduction and Motivation}
+AI data centers are waiting on the grid. A utility sizes a connection for the facility's peak draw, and in constrained regions the transmission and generation to serve that peak now take seven to ten years to build~\cite{norris2025rethinking}. The peak is rarely needed: across the 22 largest US balancing authorities, 76--126\,GW of new load could connect on existing headroom if it curtailed for just 0.25--1\% of hours~\cite{norris2025rethinking}. Utilities have begun offering that trade---\emph{flexible interconnection}: connect sooner, shed on request---and a 2025 Phoenix demonstration curtailed a 256-GPU cluster 25\% for three hours on the utility's signal~\cite{colangelo2025phoenix}. Grid-side models now price such flexibility by its depth, duration, ramp rate and recovery~\cite{khanal2026shift}.
+
+The obligation lands on whoever operates the cluster, and it is a distributed-systems problem: an LLM serving cluster is a set of GPU processes with different bottlenecks sharing one power budget. Generative inference has two phases~\cite{patel2024splitwise}: \emph{prefill} processes the prompt and is compute-bound; \emph{decode} emits one token per step and is bound by memory bandwidth, reading every weight per step. Disaggregated serving places the phases on separate GPUs and hands the KV cache between them~\cite{zhong2024distserve,qin2025mooncake}, turning ``which GPU do we throttle'' into ``which \emph{phase},'' with an explicit communication cost (the KV transfer) and a coordination problem between pools sharing one cap. Our preliminary measurements (one A100, 72 thermally-controlled windows) show the phases need different levers: prefill windows drew 230\,W with the driver's power-cap flag set 90\% of the time, decode windows 200\,W with it never set, an idle model-resident GPU 40\,W, and batching cut decode energy per token 25$\times$ while \emph{raising} mean power.
+
+We restrict ourselves to \emph{unprivileged} levers---admission control, concurrency caps, tier-aware shedding, and draining a pool to idle---because a tenant on shared infrastructure, or a Kubernetes operator, cannot set clocks or caps. Expected contributions:
+\begin{itemize}
+\item \textbf{C1.} Per-pool flexibility curves (power, TTFT, TPOT versus request rate) for prefill and decode pools on two A100s; we expect admission drain to remove $\geq$70\% of prefill-pool power within 5\,s.
+\item \textbf{C2.} An event-response characterization (depth, ramp, duration, recovery, rebound) of four unprivileged levers $\times$ two pools under replayed grid events, with KV-transfer overhead measured.
+\item \textbf{C3.} A ranking by QoS cost per watt shed against monolithic tensor-parallel and no-control baselines, released with the harness and curves as open data.
+\end{itemize}
+
+\section{Related Work}
+\textbf{What the grid buys from a data center.} Grid-side work agrees on the product---the curtailment defined above, called for a small fraction of hours~\cite{norris2025rethinking,khanal2026shift}---and disagrees on how a data center supplies it. The demand-response lineage models the facility as a deferrable aggregate: Wierman et al.~\cite{wierman2014dcdr} and Liu et al.~\cite{liu2013dcdr} shift batch work in time to dodge coincident peaks, and Lin and Chien~\cite{lin2023adapting} adapt capacity to grid conditions the same way. All three assume the shed comes from work that can wait, which interactive inference cannot. The measurement lineage curtails real AI clusters instead---Acun et al.~\cite{acun2026flexdc} on training jobs, the Emerald demonstrations~\cite{colangelo2025phoenix,williams2026powerflex} on a production site with one capped-vLLM data point and inference SLOs named as the open gap. Both lineages treat the data center as a black box; nothing inside the serving stack is a control target.
+
+\textbf{Power control inside the data center.} Two lineages make opposite assumptions. Fleet-scale capping~\cite{wu2016dynamo,li2020thunderbolt,patel2024polca} assumes privileged control of power caps and treats latency-critical services as protected: Thunderbolt caps batch work first, and POLCA asks how far LLM inference can be oversubscribed \emph{without} touching its latency. The question is how much cap is safe, not how to shed on demand. LLM-specific energy work inverts this: inference is the object, and DynamoLLM~\cite{stojkovic2025dynamollm}, $\mu$-Serve~\cite{qiu2024userve}, Kakolyris et al.~\cite{kakolyris2024slo}, VoltanaLLM~\cite{yu2026voltana} and the BiScale and RAPID preprints~\cite{dualscale2026,rapid2026} exploit the prefill/decode asymmetry through frequency scaling, placement and routing to minimize steady-state energy or hold SLOs under a fixed budget. Both assume privileged clock control and a stationary objective; none evaluates an exogenous, time-varying signal or reports rebound after release. Between the lineages a quadrant is empty: inference as the shed target, unprivileged levers, transient response.
+
+\textbf{Where the control targets come from.} DistServe~\cite{zhong2024distserve} and Splitwise~\cite{patel2024splitwise} buy freedom from prefill/decode interference at the price of a KV-cache transfer; Sarathi-Serve~\cite{agrawal2024sarathi} keeps one pool and pays in scheduling granularity; Mooncake~\cite{qin2025mooncake} shows the transfer is affordable in production. For power, only disaggregation yields pools that can be throttled separately---Splitwise measured the asymmetry but spent it on hardware provisioning. Energy-measurement practice~\cite{you2023zeus,niu2026tokenpowerbench} and SweetSpot's steady-state model~\cite{cavagna2026sweetspot} supply counters, attribution and a prediction our transient traces can test.
+
+\textbf{Gap.} No study measures, on a disaggregated deployment, the event response of software-only levers per phase pool---including the communication cost of the KV handoff---and reports it in the quantities the grid buys.
+
+\section{Research Questions and Hypotheses}
+\RQ{1} How much power can each pool shed with unprivileged levers, and how fast? \hy{1}: admission drain removes $\geq$70\% of prefill-pool and $\geq$60\% of decode-pool power within 5\,s; batch capping lowers energy per token but changes mean power by $<$10\%.
+\RQ{2} What does disaggregation cost in communication, and does it change the flexibility frontier? \hy{2}: the handoff cost is per-request coordination, not PCIe bandwidth---a 180-token handoff moves $\sim$5\,MB ($<$1\,ms on PCIe) yet added 34\,ms to median TTFT in our smoke test---so its share of TTFT falls with prompt length; and disaggregation sheds $\geq$1.5$\times$ the watts of a monolithic TP=2 deployment at equal QoS cost.
+\RQ{3} Under a replayed grid event, which pool $\times$ lever minimizes QoS cost per watt shed, and how large is the rebound? \hy{3}: prefill-side levers cost less TTFT per watt than decode-side levers cost TPOT per watt at equal depth; power rebounds $\geq$10\% above the pre-event mean for $\geq$30\,s after release.
+
+\section{Proposed Approach}
+\textbf{System.} Two vLLM~\cite{kwon2023vllm} 0.28 instances on one node---a prefill producer on GPU\,0 and a decode consumer on GPU\,1---exchange KV blocks through vLLM's NIXL connector, which runs on UCX over PCIe on our NVLink-less A100 pair; a proxy routes each request through both. Decomposition is by phase: a two-stage pipeline across processes whose communication volume is the KV cache, $\sim$28\,KB per prompt token at 1.5B and twice that at 7B.
+
+\textbf{Control plane (MPI, C++).} Rank~0 is the controller: it replays a grid event as a power-budget trajectory and issues lever commands with non-blocking \texttt{MPI\_Isend}. Ranks 1--2 sit one per GPU: a sampler thread reads NVML power, clocks and throttle reasons at 20\,Hz into a ring buffer while the main thread reads the hardware energy counter and actuates its pool through the serving API. Cluster power is aggregated with \texttt{MPI\_Allreduce}, per-window samples with \texttt{MPI\_Gather}, and \texttt{MPI\_Barrier} aligns window boundaries across GPUs.
+
+\textbf{Load generation (C++ threads).} One thread per stream replays trace inter-arrival times open-loop via libcurl, tagging requests firm or flexible.
+
+\textbf{Levers} (unprivileged, per pool): admission drain (in-flight requests finish), concurrency cap, flexible-tier shedding, and park (drain to model-resident idle). Load balancing is the prefill-to-decode GPU ratio, fixed at 1:1 here. Frequency scaling and power caps are excluded by design.
+
+\section{Evaluation Plan}
+\textbf{Baselines.} (B1) monolithic vLLM with tensor parallelism across the same two GPUs; (B2) no control under the event; (B3) proportional throttling of both pools equally.
+\textbf{Metrics.} Power per pool (mean, peak); energy per token by phase; TTFT, TPOT (median, p99), goodput under SLOs; KV-transfer overhead (TTFT versus B1, bytes per request); shed depth, ramp, recovery, rebound; QoS cost per watt shed.
+\textbf{Workloads.} Public Azure LLM inference traces (coding and conversation, $\sim$20k requests each~\cite{patel2024splitwise}) for arrival and length distributions; grid events sampled from five years of CAISO and PJM hourly stress hours (12{,}840 event-hours).
+\textbf{Hardware.} RIT Research Computing: two A100-PCIe-40GB on one Slurm node; Qwen2.5-1.5B for sweeps, 7B for final runs.
+\textbf{Rigor.} Three repetitions per point, thermally-controlled windows (start $\leq$45\,$^\circ$C), 95\% confidence intervals; E1$\rightarrow$\RQ{1}, E2$\rightarrow$\RQ{2}, E3$\rightarrow$\RQ{3}.
+
+\section{Timeline, Roles, and Risks}
+Single author; milestones in Table~\ref{tab:timeline}.
+\begin{table}[h]
+\centering\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Weeks & Milestone & Deliverable\\
+\midrule
+4 & Disaggregation smoke test (passed); proposal & go\\
+5--6 & E1: probe + load generator; rate sweeps & Update I\\
+7--8 & E2: MPI harness; disaggregated vs.\ TP=2 & curves v1\\
+9--10 & E3: replayed events; lever $\times$ pool & QoS/W table\\
+11--14 & 7B repeat of E1/E3; paper (ICPE format) & Update II; paper\\
+\bottomrule
+\end{tabular}
+\caption{Milestones (week 1 = 24 Aug 2026).}\label{tab:timeline}
+\end{table}
+
+\textbf{Risks.} (R1) SPORC nodes differ in GPU topology (same- vs cross-socket PCIe): pin runs with \texttt{-{}-nodelist} and report topology; file-backed and Ray Serve fallbacks remain. (R2) Queue waits: the single-GPU prototype exists, so measurement never blocks on the C++ rewrite.
+
+\section{Target Venue}
+Primary: ICPE, the ACM/SPEC Int'l Conference on Performance Engineering (CORE B), whose recent program includes LLM-inference energy modeling~\cite{cavagna2026sweetspot} and transformer resource-efficiency studies~\cite{wallace2025icpe}. Backup: IEEE/ACM CCGrid (CORE B).
+
+\bibliographystyle{IEEEtran}
+\bibliography{mattu_proposal}
+\end{document}

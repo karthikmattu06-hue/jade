@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jade — project proposal</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#5f6368; --blue:#1f4e9c; --green:#2e7d4f; --rule:#e3e6ea; }
+  body { margin:0; background:#fff; color:var(--ink); font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:16.5px; line-height:1.6; }
+  main { max-width:860px; margin:0 auto; padding:56px 24px 72px; }
+  header h1 { font-size:30px; line-height:1.2; margin:0 0 10px; letter-spacing:-0.2px; }
+  header p.meta { margin:0; color:var(--muted); font-size:15px; }
+  header { padding-bottom:22px; border-bottom:1px solid var(--rule); margin-bottom:30px; }
+  h2 { font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--blue); margin:38px 0 10px; }
+  p { margin:0 0 14px; }
+  code { font-family:Menlo, Consolas, monospace; font-size:0.9em; background:#f3f4f6; padding:1px 5px; border-radius:4px; }
+  figure { margin:18px 0 8px; }
+  figcaption { font-size:14px; color:var(--muted); margin-top:6px; }
+  ol.key { margin:14px 0 22px; padding:0; list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:8px 28px; font-size:15px; }
+  ol.key li { display:flex; gap:10px; align-items:flex-start; }
+  ol.key .b { flex:0 0 22px; height:22px; border-radius:50%; background:var(--blue); color:#fff; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+  ol.key .b.g { background:#555; } ol.key .b.o { background:#c2601a; } ol.key .b.n { background:var(--green); }
+  .q { font-size:19px; line-height:1.45; font-weight:600; color:var(--blue); border-left:4px solid var(--blue); padding:6px 0 6px 18px; margin:18px 0 20px; }
+  table.exp { width:100%; border-collapse:collapse; font-size:14.5px; margin:10px 0 6px; }
+  table.exp th { text-align:left; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--rule); }
+  table.exp td { padding:7px 8px; border-bottom:1px solid var(--rule); vertical-align:top; }
+  table.exp td.id { font-family:Menlo, Consolas, monospace; font-size:13px; white-space:nowrap; }
+  table.exp tr.done td { background:#f3f8f5; }
+  dl.scope { margin:0; display:grid; grid-template-columns:110px 1fr; gap:8px 18px; }
+  dl.scope dt { font-weight:600; } dl.scope dd { margin:0; }
+  ul.tight { margin:0 0 14px; padding-left:22px; } ul.tight li { margin:3px 0; }
+  @media (max-width:620px) { ol.key { grid-template-columns:1fr; } dl.scope { grid-template-columns:1fr; gap:2px; } dl.scope dd { margin-bottom:8px; } }
+  @media print { main { padding:0; max-width:none; } body { font-size:11.5pt; } h2 { margin-top:22px; } figure, .q, table.exp { break-inside:avoid; } }
+</style></head>
+<body><main>
+<header>
+  <h1>Jade: measuring what an LLM serving system can give back to the grid</h1>
+  <p class="meta">Project proposal · DSCI-650 High Performance Data Science, Fall 2026 · Karthik Mattu (km5503@rit.edu) · solo</p>
+</header>
+
+<h2>Problem and question</h2>
+<p>Grid operators pay large electricity users to shed load on request, and AI datacenters would like to say yes. Emerald AI's 2026 field trials show it works for <em>training</em> by capping GPU power. Interactive <em>inference</em> is the open case: their paper, and the BU PEAC Lab's e-Energy '26 study, both list inference latency boundaries, prefill/decode decomposition and rebound as future work. Nobody has measured, on a real serving stack, which part of an LLM service you can turn down, how much power that returns, how fast, and what it costs the people waiting for an answer.</p>
+<p class="q">For interactive LLM serving, how much power can be shed, how fast, and at what cost to p50/p99 latency — using only the knobs the serving software exposes — and how does splitting prefill from decode across GPUs change the answer?</p>
+<p>An LLM answers a request in two phases with opposite profiles. <b>Prefill</b> reads the whole prompt at once: compute-bound, brief, the GPU's highest draw. <b>Decode</b> writes the answer one token at a time: memory-bandwidth-bound, long, lower draw. Modern serving systems (vLLM, llm-d, NVIDIA Dynamo) can run the two on separate GPU pools. If the phases have different power signatures, that split hands an operator a control surface a single server does not have. Jade measures whether that is true, by how much, and what using it costs.</p>
+
+<h2>System</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 470" width="100%" role="img" aria-label="Measurement rig: drive, serve, sense, export" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"><defs><marker id="ctl" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 z" fill="#1f4e9c"/></marker><marker id="tel" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 z" fill="#555"/></marker><marker id="ext" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 z" fill="#c2601a"/></marker><marker id="grn" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L9,4.5 L0,9 z" fill="#2e7d4f"/></marker></defs>
+
+<!-- DRIVE -->
+<rect x="20" y="20" width="250" height="240" rx="12" fill="#f7f9fd" stroke="#1f4e9c" stroke-width="1.2"/>
+<text x="34" y="40" font-size="11.5" font-weight="700" fill="#1f4e9c" letter-spacing="1.5">DRIVE</text>
+<rect x="36" y="48" width="218" height="72" rx="8" fill="#fff" stroke="#1f4e9c" stroke-width="1.4"/>
+<text x="145" y="72" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">Load generator  ·  C++</text>
+<text x="145" y="87" font-size="11.5" fill="#444" text-anchor="middle">one thread per request stream, libcurl</text>
+<text x="145" y="101" font-size="11.5" fill="#444" text-anchor="middle">tiered trace, premium / flex, set rate</text>
+<rect x="36" y="146" width="218" height="98" rx="8" fill="#fff" stroke="#1f4e9c" stroke-width="1.4"/>
+<text x="145" y="172" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">Harness  ·  MPI rank 0  (E2, E3)</text>
+<text x="145" y="187" font-size="11.5" fill="#444" text-anchor="middle">replays a grid event, e.g. "shed 30 %"</text>
+<text x="145" y="201" font-size="11.5" fill="#444" text-anchor="middle">decides pool × lever, sends commands</text>
+<text x="145" y="215" font-size="11.5" fill="#444" text-anchor="middle">to the GPU ranks (Isend / Irecv),</text>
+<text x="145" y="229" font-size="11.5" fill="#444" text-anchor="middle">gathers cluster power (Allreduce)</text>
+
+<!-- SERVE -->
+<rect x="320" y="20" width="260" height="240" rx="12" fill="#f8fcf9" stroke="#2e7d4f" stroke-width="1.2"/>
+<text x="334" y="40" font-size="11.5" font-weight="700" fill="#2e7d4f" letter-spacing="1.5">SERVE  ·  one Slurm job on SPORC</text>
+<rect x="336" y="48" width="228" height="60" rx="8" fill="#fff" stroke="#2e7d4f" stroke-width="1.4"/>
+<text x="450" y="69" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">prefill pool  (vLLM · A100 #1)</text>
+<text x="450" y="84" font-size="11.5" fill="#444" text-anchor="middle">reads prompts · compute-bound</text>
+<text x="450" y="98" font-size="11.5" fill="#444" text-anchor="middle">≈ 230 W busy · cap flag set 90 %</text>
+<rect x="336" y="128" width="228" height="60" rx="8" fill="#fff" stroke="#2e7d4f" stroke-width="1.4"/>
+<text x="450" y="149" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">decode pool  (vLLM · A100 #2)</text>
+<text x="450" y="164" font-size="11.5" fill="#444" text-anchor="middle">writes answers · bandwidth-bound</text>
+<text x="450" y="178" font-size="11.5" fill="#444" text-anchor="middle">≈ 200 W busy · cap never binds</text>
+<polyline points="450,108 450,126" fill="none" stroke="#2e7d4f" stroke-width="2" marker-end="url(#grn)"/>
+<rect x="458" y="110" width="78" height="14" fill="#f8fcf9" opacity="0.95"/>
+<text x="462" y="121" font-size="11" fill="#2e7d4f" font-style="italic">KV cache handoff</text>
+<rect x="336" y="198" width="228" height="50" rx="8" fill="#fff" stroke="#2e7d4f" stroke-width="1.4"/>
+<text x="450" y="216" font-size="13" font-weight="600" fill="#111" text-anchor="middle">Microbenchmark  ·  CUDA  (E1.5)</text>
+<text x="450" y="231" font-size="11.5" fill="#444" text-anchor="middle">streaming ≈ decode · dense FLOPs ≈ prefill</text>
+<text x="450" y="244" font-size="11.5" fill="#444" text-anchor="middle">→ J / byte and J / FLOP for the silicon</text>
+
+<!-- SENSE -->
+<rect x="630" y="20" width="250" height="240" rx="12" fill="#fafafa" stroke="#555" stroke-width="1.2"/>
+<text x="644" y="40" font-size="11.5" font-weight="700" fill="#555" letter-spacing="1.5">SENSE  ·  per GPU</text>
+<rect x="646" y="48" width="218" height="100" rx="8" fill="#fff" stroke="#555" stroke-width="1.4"/>
+<text x="755" y="70" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">Energy probe  ·  MPI ranks 1..N</text>
+<text x="755" y="86" font-size="11.5" fill="#444" text-anchor="middle">C++ · NVML C API · one rank per GPU</text>
+<text x="755" y="100" font-size="11.5" fill="#444" text-anchor="middle">sampler thread → ring buffer, 20 Hz</text>
+<text x="755" y="114" font-size="11.5" fill="#444" text-anchor="middle">joules counter · clock · throttle flag</text>
+<text x="755" y="128" font-size="11.5" fill="#444" text-anchor="middle">direct attribution + gated cross-check</text>
+<text x="755" y="142" font-size="11" fill="#666" text-anchor="middle" font-style="italic">validity: fitted baseline must match measured</text>
+<rect x="646" y="164" width="218" height="80" rx="8" fill="#eef0f3" stroke="#555" stroke-width="1.4"/>
+<text x="755" y="187" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">Lever curves  (JSON)</text>
+<text x="755" y="202" font-size="11.5" fill="#444" text-anchor="middle">per pool × lever: depth as % of nominal,</text>
+<text x="755" y="216" font-size="11.5" fill="#444" text-anchor="middle">ramp s, recovery s, Δp50 / Δp99</text>
+<text x="755" y="230" font-size="11.5" fill="#444" text-anchor="middle">every field tagged measured / estimated</text>
+
+<!-- arrows -->
+<polyline points="270,84 334,78" fill="none" stroke="#1f4e9c" stroke-width="2" marker-end="url(#ctl)"/>
+<circle cx="296" cy="64" r="10" fill="#1f4e9c"/><text x="296" y="68.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<rect x="276" y="90" width="52" height="14" fill="#fff" opacity="0.94"/><text x="302" y="100" font-size="11.5" fill="#1f4e9c" text-anchor="middle" font-style="italic">requests</text>
+<polyline points="270,195 300,195 300,158 334,158" fill="none" stroke="#1f4e9c" stroke-width="2" marker-end="url(#ctl)"/>
+<circle cx="296" cy="216" r="10" fill="#1f4e9c"/><text x="296" y="220.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<rect x="272" y="228" width="48" height="14" fill="#fff" opacity="0.94"/><text x="296" y="238" font-size="11.5" fill="#1f4e9c" text-anchor="middle" font-style="italic">levers</text>
+<polyline points="580,100 644,100" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#tel)"/>
+<polyline points="580,168 612,168 612,112" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="4,3"/>
+<circle cx="612" cy="84" r="10" fill="#555"/><text x="612" y="88.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<rect x="586" y="180" width="60" height="14" fill="#fff" opacity="0.94"/><text x="616" y="190" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">watts, flag</text>
+<polyline points="755,148 755,162" fill="none" stroke="#555" stroke-width="2" marker-end="url(#tel)"/>
+<circle cx="775" cy="155" r="10" fill="#555"/><text x="775" y="159.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+
+<!-- ANALYSE -->
+<rect x="320" y="300" width="560" height="120" rx="12" fill="#f7f9fd" stroke="#1f4e9c" stroke-width="1.2"/>
+<text x="334" y="320" font-size="11.5" font-weight="700" fill="#1f4e9c" letter-spacing="1.5">ANALYSE  ·  the ladder</text>
+<rect x="336" y="330" width="168" height="74" rx="8" fill="#fff" stroke="#1f4e9c" stroke-width="1.4"/>
+<text x="420" y="351" font-size="13" font-weight="600" fill="#111" text-anchor="middle">E1 · load sweep</text>
+<text x="420" y="366" font-size="11.5" fill="#444" text-anchor="middle">power, TTFT, TPOT vs</text>
+<text x="420" y="380" font-size="11.5" fill="#444" text-anchor="middle">request rate, one GPU</text>
+<text x="420" y="394" font-size="11" fill="#666" text-anchor="middle" font-style="italic">the depth &amp; ramp curve</text>
+<rect x="516" y="330" width="168" height="74" rx="8" fill="#fff" stroke="#1f4e9c" stroke-width="1.4"/>
+<text x="600" y="351" font-size="13" font-weight="600" fill="#111" text-anchor="middle">E2 · disaggregate</text>
+<text x="600" y="366" font-size="11.5" fill="#444" text-anchor="middle">same trace, two A100s,</text>
+<text x="600" y="380" font-size="11.5" fill="#444" text-anchor="middle">power per pool</text>
+<text x="600" y="394" font-size="11" fill="#666" text-anchor="middle" font-style="italic">what the split adds</text>
+<rect x="696" y="330" width="168" height="74" rx="8" fill="#fff" stroke="#1f4e9c" stroke-width="1.4"/>
+<text x="780" y="351" font-size="13" font-weight="600" fill="#111" text-anchor="middle">E3 · grid event replay</text>
+<text x="780" y="366" font-size="11.5" fill="#444" text-anchor="middle">budget → levers → shed,</text>
+<text x="780" y="380" font-size="11.5" fill="#444" text-anchor="middle">ramp, recovery, Δp99</text>
+<text x="780" y="394" font-size="11" fill="#666" text-anchor="middle" font-style="italic">QoS cost per watt shed</text>
+<polyline points="504,367 514,367" fill="none" stroke="#1f4e9c" stroke-width="2" marker-end="url(#ctl)"/>
+<polyline points="684,367 694,367" fill="none" stroke="#1f4e9c" stroke-width="2" marker-end="url(#ctl)"/>
+<polyline points="755,244 755,290 600,290 600,298" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#tel)"/>
+<circle cx="678" cy="288" r="10" fill="#555"/><text x="678" y="292.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<rect x="692" y="277" width="72" height="14" fill="#fff" opacity="0.94"/><text x="696" y="287" font-size="11.5" fill="#555" font-style="italic">every window</text>
+
+<!-- external -->
+<rect x="20" y="318" width="250" height="84" rx="8" fill="#fdf2e7" stroke="#c2601a" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="145" y="342" font-size="13.5" font-weight="600" fill="#111" text-anchor="middle">Control plane</text>
+<text x="145" y="357" font-size="11.5" fill="#444" text-anchor="middle">my Modern Cloud Computing project (GKE)</text>
+<text x="145" y="371" font-size="11.5" fill="#444" text-anchor="middle">consumes the curve file as policy</text>
+<text x="145" y="385" font-size="11.5" fill="#444" text-anchor="middle">separate code, compute, grade</text>
+<polyline points="700,244 700,266 296,266 296,316" fill="none" stroke="#c2601a" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#ext)"/>
+<circle cx="296" cy="292" r="10" fill="#c2601a"/><text x="296" y="296.5" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">C</text>
+<rect x="308" y="285" width="76" height="14" fill="#fff" opacity="0.94"/><text x="312" y="295" font-size="11.5" fill="#c2601a" font-style="italic">one JSON file</text>
+
+<text x="20" y="446" font-size="11.5" fill="#666">Solid blue = traffic and levers · dotted grey = telemetry · green = serving · dashed orange = the only thing that leaves this project.</text>
+<text x="20" y="463" font-size="11.5" fill="#666">Instrument in C++ / MPI / CUDA; vLLM is a Python service used as a black box over HTTP. Substrate: RIT SPORC · Slurm · A100-PCIE-40GB, 250 W · no root.</text>
+</svg><figcaption>Figure 1 — the measurement rig. Everything inside the blue, green and grey zones is this project and runs in one Slurm job on RIT's cluster. E0–E1 use one A100 with the phases separated analytically; from E2 the two phases run on separate A100s.</figcaption></figure>
+<ol class="key">
+  <li><span class="b">1</span><span>A multithreaded C++ load generator replays an identical tiered trace (premium / flex) at a controlled request rate, so every configuration sees the same work.</span></li>
+  <li><span class="b">2</span><span>In E2/E3 an MPI harness runs the experiment: rank 0 replays a grid event and issues lever commands asynchronously; one rank per GPU samples power and actuates vLLM; cluster power is a collective.</span></li>
+  <li><span class="b g">3</span><span>vLLM serves the model; from E2 on, prefill and decode run on separate A100s with the KV cache handed between them. Each GPU rank reads watts, clock and the driver's throttle flag through NVML's C API.</span></li>
+  <li><span class="b g">4</span><span>The probe attributes energy to phases by direct division on near-pure windows, and gates its own cross-check: if a regression cannot recover the measured baseline, its coefficients are not quoted.</span></li>
+  <li><span class="b g">5</span><span>Every window feeds the experiments. E1.5's CUDA kernels are metered by the same probe, giving the silicon's joules per byte and per FLOP — the first-principles model the vLLM numbers are checked against.</span></li>
+  <li><span class="b o">C</span><span>The output is one JSON file of lever curves. My Modern Cloud Computing project consumes it as policy (see below); nothing else crosses.</span></li>
+</ol>
+
+<h2>How this uses the course technologies</h2>
+<p>The serving engine (vLLM) is a Python service treated as a black box over HTTP. Everything that measures it, drives it and controls it is written in C++ against the three course modules. Components are built in the order the experiments need them; where that runs ahead of the corresponding module, I learn the material early.</p>
+<table class="exp">
+  <thead><tr><th>Module</th><th>Component</th><th>What it produces</th></tr></thead>
+  <tbody>
+    <tr><td class="id">C++ · threads</td><td><b>Energy probe</b>: a sampler thread on NVML's C API at 20 Hz into a ring buffer; the main thread reads the hardware energy counter and drives the workload. <b>Load generator</b>: one thread per concurrent request stream, libcurl.</td><td>Replaces the Python prototype used for E0. Acceptance test: it must reproduce E0.1's numbers (parked ≈ 40 W, prefill ≈ 230 W, cap flag ≈ 90 %).</td></tr>
+    <tr><td class="id">MPI</td><td><b>Harness</b>: rank 0 is the controller (grid event in, lever commands out via <code>Isend</code>/<code>Irecv</code>); ranks 1..N sit one per GPU, sampling and actuating; cluster power by <code>Allreduce</code>/<code>Gather</code>.</td><td>Runs E2 and E3. The same binary with ranks on two nodes is E2b — multi-node without a second framework. The KV-cache handoff inside vLLM uses NCCL, MPI's GPU cousin, which the paper discusses alongside.</td></tr>
+    <tr><td class="id">CUDA</td><td><b>Microbenchmark</b>: a streaming kernel (bandwidth-bound, decode's weight read) and a dense FLOP kernel (compute-bound, prefill), pinned vs pageable memory, streams and events for timing, metered by the probe.</td><td><b>Joules per byte and joules per FLOP</b> for the A100 — a first-principles model that predicts the per-phase vLLM energy (decode ≈ 3.09 GB/step × J/byte; prefill ≈ FLOPs × J/FLOP) and separates what is intrinsic to the silicon from what the serving engine adds.</td></tr>
+  </tbody>
+</table>
+<p>Toolchain confirmed on SPORC: <code>cuda@12.8.0</code> and <code>openmpi@4.1.6</code> built with <code>gcc@12.3.1</code> for the compute nodes' platform; the A100 is <code>sm_80</code>.</p>
+
+<h2>What is already measured (weeks 2–3, one A100)</h2>
+<ul class="tight">
+  <li><b>Draining is the lever.</b> Busy 197–230 W, parked with the model loaded 39–43 W: stop sending a GPU work and ~80 % of its draw is gone in seconds.</li>
+  <li><b>The 250 W limit binds on prefill, not decode</b> — by the driver's own throttle flag, set ~90 % of the time in prefill-heavy windows and 0 % in small-batch decode. A prefill window <em>averaging</em> 230 W was still capped 90 % of the time: mean-below-limit is not headroom.</li>
+  <li><b>Decode costs ~27× more energy per token than prefill</b> yet draws less power; batching cuts decode joules per token 25× from batch 1 to 32 while raising mean power — an efficiency lever, not a power lever.</li>
+</ul>
+
+<h2>Experiments</h2>
+<table class="exp">
+  <thead><tr><th>Exp</th><th>Question</th><th>Instrument · setup</th><th>Weeks</th></tr></thead>
+  <tbody>
+    <tr class="done"><td class="id">E0 / E0.1</td><td>Joules per phase; does the limit bind; decode cost vs batch — <b>done</b></td><td>Python prototype · 1 × A100, 72 cooled windows</td><td>2–3</td></tr>
+    <tr><td class="id">E1</td><td>Power, TTFT and TPOT as functions of request rate — the depth-and-ramp curve every lever references</td><td>C++ probe + load generator · 1 × A100, rate 0 → saturation (first pass on the prototype in week 3 so the curve is not blocked on the rewrite)</td><td>3–5</td></tr>
+    <tr><td class="id">E2</td><td>How does physically separating prefill and decode change what can be shed and what it costs?</td><td>MPI harness · 2 × A100, vLLM disaggregated prefill, KV transfer over NCCL</td><td>6–7</td></tr>
+    <tr><td class="id">E3</td><td>Under a replayed grid event, which pool × lever, at what QoS cost per watt shed? Rebound on recovery?</td><td>MPI harness · 2 × A100, software levers only</td><td>8–9</td></tr>
+    <tr><td class="id">E1.5</td><td>What does the silicon itself cost per byte moved and per FLOP — and does it predict E1's per-phase numbers?</td><td>CUDA microbenchmark · 1 × A100 · off the critical path</td><td>10–11</td></tr>
+    <tr><td class="id">E4</td><td>Repeat E1/E3 on Qwen2.5-7B for citable numbers; write-up</td><td>tier3 partition, <code>--exclusive</code></td><td>11–12</td></tr>
+  </tbody>
+</table>
+<p>Project Update I lands after E1 (the C++ probe validated against the prototype); Update II after E2/E3; the paper is drafted from week 12. The distributed content is E2 and E3: two GPUs serving one model as separate pools with inter-process KV-cache transfer, an MPI controller coordinating per-GPU ranks, tier-aware admission, and a policy that has to reason about which pool to cut. If queues allow, E2b runs the same harness across two nodes. Reported metric: <b>QoS cost per watt shed</b> — the same family as my CoordDR work on moving load <em>between</em> datacenters, so the two studies share a vocabulary.</p>
+
+<h2>Relationship to my Modern Cloud Computing project</h2>
+<p>My other class project this term (with Prof. Fang) builds a Kubernetes operator on GKE that enforces a declared power budget on a live vLLM deployment by pulling these same levers automatically. The only thing the two projects share is one JSON file — the lever-curve schema, values as fractions of nominal GPU power. That project runs on synthetic curves from day one and is complete without Jade's results; Jade's measurements are complete without the operator. Shared: problem domain, vLLM, the Qwen2.5 model family, NVIDIA power telemetry as the measured quantity. Not shared: code, compute, experiments, or any graded artifact. I am glad to adjust the split if you would prefer a cleaner separation.</p>
+
+<h2>Scope, constraints, needs</h2>
+<dl class="scope">
+  <dt>Must</dt><dd>C++ probe and load generator; MPI harness; CUDA microbenchmark; E1–E3 on Qwen2.5-1.5B; lever curves exported in the schema; paper; public repo with CI, tests and ADRs.</dd>
+  <dt>Should</dt><dd>E4 on 7B; E2b across two nodes with the same MPI binary; curves exported in a form the BU PEAC Lab's open FlexDC-Sim simulator can ingest, offered to that group.</dd>
+  <dt>Stretch</dt><dd>Budgets driven from real CAISO/PJM stress hours already in my CoordDR dataset; a monolithic tensor-parallel (TP=2) baseline on the same two GPUs for E4.</dd>
+  <dt>Constraints</dt><dd>Software levers only — no root, no <code>nvidia-smi</code> power caps or clock locks (asked RC; not available). No quality-degrading knobs (reasoning effort, quantization): those belong to the model provider and the user, not the datacenter. AI assistance is used for design and code as you have permitted, and is disclosed in the repository and the paper.</dd>
+  <dt>Needs</dt><dd>A two-A100, single-node Slurm allocation from week 6 (debug partition for iteration, tier3 for the E4 runs). Toolchain already present via spack. No cloud spend; RIT compute only.</dd>
+</dl>
+</main></body></html>

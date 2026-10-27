@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jade</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F3F5F7; --surface: #FFFFFF; --surface-2: #E9EDF0;
+    --ink: #1A232C; --muted: #5B6875; --line: #C7D0D8;
+    --me: #2F7F6F; --me-soft: #D8ECE7;          /* this project: jade */
+    --other: #8A96A2; --other-soft: #EEF1F3;    /* the other course: grey */
+    --warn: #B07A0E;
+    --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F161C; --surface: #17212A; --surface-2: #1F2B36;
+      --ink: #E4EAEF; --muted: #9AA8B4; --line: #2E3C49;
+      --me: #4FB39E; --me-soft: #163A33; --other: #7B8893; --other-soft: #1A232B; --warn: #E0A83A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F161C; --surface: #17212A; --surface-2: #1F2B36;
+    --ink: #E4EAEF; --muted: #9AA8B4; --line: #2E3C49;
+    --me: #4FB39E; --me-soft: #163A33; --other: #7B8893; --other-soft: #1A232B; --warn: #E0A83A;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.5; margin: 0; }
+  main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 72px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+  h1 { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+  h2 { font-size: 1.25rem; font-weight: 600; margin-top: 44px; margin-bottom: 8px; }
+  p { margin: 0 0 12px; max-width: 72ch; }
+  .lede { font-size: 1.12rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+  .me { color: var(--me); font-weight: 600; } .other { color: var(--other); font-weight: 600; }
+  .header { border-bottom: 1px solid var(--line); padding-bottom: 22px; display: grid; gap: 10px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 0.82rem; color: var(--muted); }
+  .facts b { color: var(--ink); font-weight: 500; }
+
+  .states { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 14px 0 4px; }
+  .st { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .st .k { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .st .w { font-family: var(--display); font-size: 1.6rem; font-weight: 700; margin: 2px 0; font-variant-numeric: tabular-nums; }
+  .st p { font-size: 0.92rem; margin: 0; color: var(--muted); max-width: none; }
+  @media (max-width: 700px) { .states { grid-template-columns: 1fr; } }
+
+  .fig { margin: 14px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; overflow-x: auto; }
+  figure { margin: 0; } figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 8px; }
+  svg.map { display: block; width: 100%; height: auto; min-width: 820px; color: var(--ink); font-family: var(--sans); }
+  svg.map text { fill: currentColor; }
+  svg.map .zone { fill: none; stroke: var(--me); stroke-width: 1; stroke-dasharray: 4 4; }
+  svg.map .zone.other { stroke: var(--other); }
+  svg.map .zl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--me); }
+  svg.map .zl.other { fill: var(--other); }
+  svg.map .box { fill: var(--surface); stroke: var(--me); stroke-width: 1.4; }
+  svg.map .box.sub { fill: var(--me-soft); stroke-width: 1; }
+  svg.map .box.other { fill: var(--other-soft); stroke: var(--other); stroke-dasharray: 5 4; }
+  svg.map .name { font-family: var(--display); font-size: 12.5px; font-weight: 600; }
+  svg.map .sub { font-size: 11px; fill: var(--muted); }
+  svg.map .flow { fill: none; stroke: var(--me); stroke-width: 1.6; }
+  svg.map .flow.tele { stroke-dasharray: 5 4; }
+  svg.map .flow.other { stroke: var(--other); stroke-dasharray: 3 5; }
+  svg.map .lbl { font-size: 10.5px; fill: var(--muted); }
+
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); overflow: hidden; margin-top: 14px; }
+  .steps > div { padding: 14px 16px 16px; border-left: 1px solid var(--line); }
+  .steps > div:first-child { border-left: 0; }
+  .steps .t { font-family: var(--mono); font-size: 0.76rem; color: var(--me); letter-spacing: 0.05em; }
+  .steps .t.done { color: var(--muted); }
+  .steps h3 { font-size: 1rem; margin: 4px 0 6px; }
+  .steps p { font-size: 0.92rem; margin: 0; max-width: none; }
+  @media (max-width: 800px) { .steps { grid-template-columns: 1fr; } .steps > div { border-left: 0; border-top: 1px solid var(--line); } .steps > div:first-child { border-top: 0; } }
+
+  .two { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; margin-top: 14px; }
+  .two > div { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+  .two h3 { font-size: 1rem; margin-bottom: 6px; }
+  .two ul { margin: 0; padding-left: 18px; font-size: 0.94rem; } .two li { margin: 3px 0; }
+  .two > div.o { border-top: 3px solid var(--other); } .two > div.m { border-top: 3px solid var(--me); }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .note { border-left: 3px solid var(--me); background: var(--surface); padding: 10px 16px; margin-top: 14px; font-size: 0.95rem; }
+  .note p { margin: 0; max-width: none; }
+</style>
+</head>
+<body>
+<main>
+  <header class="header">
+    <div class="eyebrow">DSCI-650 · High Performance Data Science · Fall 2026 · Karthik Mattu · one-page overview</div>
+    <h1>Jade — what an LLM serving system can give back to the grid</h1>
+    <p class="lede">Power grids increasingly ask large electricity users to cut load for an hour when the system is stressed. AI datacenters would like to say yes. Jade measures, on real GPUs, what happens when you try: which part of an LLM serving stack you can turn down, how many watts that returns, how fast, and what it costs the people waiting for an answer.</p>
+    <div class="facts">
+      <span>Where: <b>RIT SPORC cluster · Slurm · NVIDIA A100</b></span>
+      <span>Stack: <b>vLLM · Qwen2.5 1.5B → 7B · NVML telemetry</b></span>
+      <span>Levers: <b>software only — no root, no firmware caps</b></span>
+      <span>Status: <b>week 3 · first measurements done</b></span>
+    </div>
+  </header>
+
+  <h2>The question</h2>
+  <p>An LLM answers a request in two phases that behave nothing alike, and modern serving systems can run them on separate machines. <b>Prefill</b> reads the whole prompt at once — brief, intense, compute-bound. <b>Decode</b> writes the answer one token at a time — long, steady, limited by memory bandwidth. If the two phases have different power signatures, then splitting them gives an operator a control surface a single server does not have. Jade asks: <em>is that true, by how much, and what does using it cost?</em></p>
+
+  <h2>Three states of one GPU, in car terms</h2>
+  <p>Think of an A100 as a car with the engine running. What it burns per hour is what the grid sees; what it burns per mile is what the operator's bill sees. Both matter, and they point in opposite directions.</p>
+  <div class="states">
+    <div class="st"><div class="k">Parked · model loaded, no requests</div><div class="w">≈ 40 W</div><p>Engine idling. Where a GPU lands when you stop sending it work.</p></div>
+    <div class="st"><div class="k">Decode · writing the answer</div><div class="w">≈ 200 W</div><p>Traffic jam: lighter load, barely moving. Cheap per hour, expensive per token.</p></div>
+    <div class="st"><div class="k">Prefill · reading the prompt</div><div class="w">≈ 230 W</div><p>Highway: high power, huge distance. Expensive per hour, cheap per token.</p></div>
+  </div>
+  <p style="margin-top:12px">Measured on one A100 (250 W limit) serving Qwen2.5-1.5B under vLLM, September 2026. Decode costs about 27× more energy <em>per token</em> than prefill, yet prefill draws more <em>power</em> — because it processes roughly thirty times more tokens per second.</p>
+
+  <h2>The system</h2>
+  <div class="fig"><figure>
+    <svg class="map" viewBox="0 0 1100 340" role="img" aria-label="Jade system: a tiered load generator and an event-replay harness drive vLLM on one or two A100s inside a Slurm job; an NVML probe records energy, power, clock and throttle state per GPU; the output is a file of lever curves. A greyed box on the right shows the separate cloud-computing course that consumes that file.">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--me)"/></marker>
+        <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--other)"/></marker>
+      </defs>
+      <rect class="zone" x="20" y="28" width="810" height="292" rx="4"/>
+      <text class="zl" x="32" y="50">Jade · this project · RIT SPORC, Slurm, A100</text>
+      <rect class="zone other" x="860" y="28" width="220" height="292" rx="4"/>
+      <text class="zl other" x="872" y="50">other course · abstracted</text>
+
+      <!-- drivers -->
+      <g><rect class="box" x="40" y="70" width="180" height="60" rx="4"/>
+        <text class="name" x="52" y="92">Load generator</text>
+        <text class="sub" x="52" y="109">requests at a set rate,</text>
+        <text class="sub" x="52" y="123">tagged premium / flex</text></g>
+      <g><rect class="box" x="40" y="150" width="180" height="72" rx="4"/>
+        <text class="name" x="52" y="172">Event harness (E3)</text>
+        <text class="sub" x="52" y="189">replays a grid event, pulls</text>
+        <text class="sub" x="52" y="203">software levers: admission,</text>
+        <text class="sub" x="52" y="217">batch cap, drain</text></g>
+
+      <!-- serving -->
+      <g><rect class="box" x="270" y="70" width="290" height="90" rx="4"/>
+        <text class="name" x="282" y="92">vLLM serving engine</text>
+        <rect class="box sub" x="282" y="102" width="125" height="46" rx="3"/>
+        <text class="sub" x="290" y="121">prefill pool</text><text class="sub" x="290" y="136">reads prompts</text>
+        <rect class="box sub" x="423" y="102" width="125" height="46" rx="3"/>
+        <text class="sub" x="431" y="121">decode pool</text><text class="sub" x="431" y="136">writes answers</text></g>
+      <g><rect class="box" x="270" y="180" width="135" height="42" rx="4"/>
+        <text class="name" x="282" y="199">A100 #1 · 250 W</text>
+        <text class="sub" x="282" y="214">E0–E1: everything</text></g>
+      <g><rect class="box" x="425" y="180" width="135" height="42" rx="4"/>
+        <text class="name" x="437" y="199">A100 #2 · 250 W</text>
+        <text class="sub" x="437" y="214">E2+: decode only</text></g>
+
+      <!-- probe & output -->
+      <g><rect class="box" x="610" y="70" width="200" height="90" rx="4"/>
+        <text class="name" x="622" y="92">Energy probe</text>
+        <text class="sub" x="622" y="109">NVML: joules counter, 20 Hz</text>
+        <text class="sub" x="622" y="123">power / clock / temperature,</text>
+        <text class="sub" x="622" y="137">driver's throttle-reason flag</text>
+        <text class="sub" x="622" y="151">per GPU, per window</text></g>
+      <g><rect class="box" x="610" y="180" width="200" height="42" rx="4"/>
+        <text class="name" x="622" y="199">Lever curves · JSON</text>
+        <text class="sub" x="622" y="214">depth, ramp, recovery, Δp99</text></g>
+
+      <!-- substrate -->
+      <g><rect class="box" x="40" y="250" width="770" height="44" rx="4"/>
+        <text class="name" x="52" y="269">Substrate — RIT SPORC · Slurm job · A100-PCIE-40GB · no root</text>
+        <text class="sub" x="52" y="285">debug partition for iteration, tier3 + exclusive for citable runs · model staged to node-local disk · offline</text></g>
+
+      <!-- other course -->
+      <g><rect class="box other" x="880" y="70" width="180" height="152" rx="4"/>
+        <text class="name" x="892" y="92">Control plane</text>
+        <text class="sub" x="892" y="109">Modern Cloud Computing</text>
+        <text class="sub" x="892" y="127">A Kubernetes operator on</text>
+        <text class="sub" x="892" y="141">GKE that loads these curves</text>
+        <text class="sub" x="892" y="155">as policy and pulls the</text>
+        <text class="sub" x="892" y="169">levers automatically when</text>
+        <text class="sub" x="892" y="183">a grid event arrives.</text>
+        <text class="sub" x="892" y="205">Separate code, compute,</text>
+        <text class="sub" x="892" y="219">grade. Only the file crosses.</text></g>
+
+      <!-- flows -->
+      <path class="flow" d="M220,100 L270,100" marker-end="url(#a)"/>
+      <text class="lbl" x="226" y="93">requests</text>
+      <path class="flow" d="M220,186 L245,186 L245,120 L270,120" marker-end="url(#a)"/>
+      <text class="lbl" x="228" y="178">levers</text>
+      <path class="flow" d="M340,160 L340,180" marker-end="url(#a)"/>
+      <path class="flow" d="M490,160 L490,180" marker-end="url(#a)"/>
+      <path class="flow tele" d="M560,201 L585,201 L585,115 L610,115" marker-end="url(#a)"/>
+      <text class="lbl" x="563" y="194">watts</text>
+      <path class="flow" d="M710,160 L710,180" marker-end="url(#a)"/>
+      <text class="lbl" x="716" y="174">exports</text>
+      <path class="flow other" d="M810,201 L880,201" marker-end="url(#ao)"/>
+      <text class="lbl" x="818" y="194">one file</text>
+    </svg>
+    <figcaption>Everything inside the green boundary is this project and runs on RIT's cluster. The grey box is the other course, shown only so the interface is visible: one JSON file of measured lever curves crosses it, nothing else.</figcaption>
+  </figure></div>
+
+  <h2>What the first measurements say</h2>
+  <div class="two">
+    <div class="m"><h3>Turning the engine off is the lever</h3>
+      <ul>
+        <li>Busy is 200–230 W; parked is ~40 W. Stop sending a GPU work and let it finish, and about <b>80% of its draw is gone</b>. Nothing else comes close.</li>
+        <li>Batching is carpooling: 32 passengers cut fuel <em>per passenger</em> 25×, but the car burns slightly <em>more</em> per hour. An efficiency lever, not a power lever.</li>
+      </ul></div>
+    <div class="m"><h3>The speed governor only bites on the highway</h3>
+      <ul>
+        <li>The driver's own throttle flag says the 250 W limit is actively holding prefill back <b>~90% of the time</b>, and never touches decode at small batch.</li>
+        <li>So a power cap is a real lever for prompt-reading and a no-op for answer-writing — which is the disaggregation argument in one line. Split the phases and you can govern one without touching the other.</li>
+      </ul></div>
+  </div>
+
+  <h2>The plan — four rungs</h2>
+  <div class="steps">
+    <div><div class="t done">E0 · done · weeks 2–3</div><h3>Three states of one GPU</h3><p>Parked, decode, prefill. Energy per token per phase, decode cost versus batch size, and whether the power limit binds — measured, with the driver's own flag.</p></div>
+    <div><div class="t">E1 · next · weeks 4–5</div><h3>A half-empty road</h3><p>So far the GPU was always flat out. E1 sends requests at rising rates and records power and latency at each: admit fewer requests, get how many watts back, at what cost to the ones still waiting?</p></div>
+    <div><div class="t">E2 · weeks 6–8</div><h3>Two cars</h3><p>Prefill on one A100, decode on another, same traffic. Does separating the phases change what can be shed? This is also the distributed-systems core of the course deliverable.</p></div>
+    <div><div class="t">E3 · weeks 9–11</div><h3>The grid calls</h3><p>Replay a real event — "cut 30% for 30 minutes" — pull the software levers, measure watts shed, ramp time, recovery, and p50/p99 latency cost. Export the lever curves. Then repeat on a 7B model for citable numbers.</p></div>
+  </div>
+
+  <h2>Why this project</h2>
+  <div class="two">
+    <div class="m"><h3>For the course</h3>
+      <ul>
+        <li>Distributed serving across GPUs (E2) and, if the queue allows, across nodes with Ray.</li>
+        <li>A real measurement instrument with its own validity checks, not a benchmark script.</li>
+        <li>A shedding policy evaluated on QoS cost per watt shed — the same metric family as the author's CoordDR work on moving load <em>between</em> datacenters.</li>
+      </ul></div>
+    <div class="o"><h3>Beyond the course</h3>
+      <ul>
+        <li>Emerald AI's June 2026 field paper and the BU PEAC lab's e-Energy '26 paper both list inference SLO boundaries, prefill/decode decomposition and rebound as open work. Jade measures exactly those.</li>
+        <li>The lever curves feed two consumers: the cloud-course operator, and an open grid simulator (FlexDC-Sim) that currently lacks LLM-serving profiles.</li>
+      </ul></div>
+  </div>
+
+  <div class="note"><p><b>Deliberately out of scope:</b> anything needing root on the node (firmware power caps, clock locks) and anything that degrades answer quality (reasoning effort, quantization). A serving operator has software levers and nothing else; that is the design, not a limitation to apologise for.</p></div>
+</main>
+</body>
+</html>
