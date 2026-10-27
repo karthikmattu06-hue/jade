@@ -1,0 +1,13 @@
+# Not ours to redistribute publicly
+papers/
+docs/Project Proposal Instructions.pdf
+proposal.zip
+# OS / Python noise
+.DS_Store
+__pycache__/
+*.pyc
+# Superseded versions kept locally only (git history carries versions from here on)
+disagg/*_v[0-9].py
+disagg/*_v[0-9].sh
+# Cloud test-hour archive (its summary is in cloud/README.md)
+cloud/*.tgz
