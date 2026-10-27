@@ -1,0 +1,87 @@
+{
+  "schema_version": "0.2",
+  "source": {
+    "project": "jade",
+    "experiment": "E0.1",
+    "date": "2026-09-09",
+    "gpu": "NVIDIA A100-PCIE-40GB",
+    "nominal_w": 250,
+    "model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "serving": "vLLM 0.28.0",
+    "batch": 8,
+    "topology": "monolithic",
+    "topology_note": "one GPU serving both phases; E2 (two A100s, disaggregated) will emit topology='disaggregated' with per-pool states measured rather than estimated"
+  },
+  "states": {
+    "parked_frac":              {"value": 0.17, "status": "measured", "note": "43 W hot; 39 W cold; ~0.4 W/C"},
+    "decode_pool_busy_frac":    {"value": 0.79, "status": "estimated", "note": "from the decode-dominated window, 197 W; E2 measures on its own GPU"},
+    "prefill_pool_busy_frac":   {"value": 0.92, "status": "estimated", "note": "from the prefill-dominated window, 230 W, cap flag 90%; E2 measures on its own GPU"},
+    "monolithic_busy_frac":     {"value": 0.84, "status": "measured", "note": "mixed traffic, ~210 W"}
+  },
+  "levers": [
+    {
+      "name": "admission_by_tier",
+      "pool": "prefill",
+      "authority": "operator",
+      "depth_frac_per_unit_flex_share": {"value": 0.62, "status": "estimated", "note": "= busy - parked on the prefill pool, scaled by flex share; E3 measures"},
+      "ramp_s":       {"value": 8,    "status": "estimated", "note": "prefill queue empties in seconds; E1 measures"},
+      "recovery_s":   {"value": 30,   "status": "estimated", "note": "ramp-limited re-admission; E3 measures"},
+      "rebound_frac": {"value": 0.10, "status": "estimated", "note": "backlog hits the prefill pool at TDP; E3 measures"},
+      "delta_ttft_premium_ms": {"value": 0,    "status": "estimated"},
+      "delta_tpot_premium_ms": {"value": 0,    "status": "estimated"},
+      "delta_p99_flex_ms":     {"value": null, "status": "n/a", "note": "flex is deferred, not slowed"}
+    },
+    {
+      "name": "drain_to_parked",
+      "pool": "prefill",
+      "authority": "operator",
+      "depth_frac":   {"value": 0.76, "status": "estimated", "note": "230 -> 40 W = 191 W on the prefill-dominated window"},
+      "ramp_s":       {"value": 3,    "status": "estimated", "note": "prefill jobs are sub-second"},
+      "recovery_s":   {"value": 15,   "status": "estimated"},
+      "delta_ttft_premium_ms": {"value": null, "status": "n/a", "note": "new requests wait for the pool to reopen"},
+      "delta_tpot_premium_ms": {"value": 0,    "status": "estimated", "note": "in-flight answers keep streaming from decode"}
+    },
+    {
+      "name": "drain_to_parked",
+      "pool": "decode",
+      "authority": "operator",
+      "depth_frac":   {"value": 0.63, "status": "estimated", "note": "197 -> 40 W = 158 W on the decode-dominated window"},
+      "ramp_s":       {"value": 12,   "status": "estimated", "note": "output_len x TPOT for in-flight answers to finish; E1 measures"},
+      "recovery_s":   {"value": 15,   "status": "estimated"},
+      "delta_ttft_premium_ms": {"value": 0,    "status": "estimated"},
+      "delta_tpot_premium_ms": {"value": null, "status": "n/a", "note": "forcing it stalls in-flight answers; normally never forced"}
+    },
+    {
+      "name": "replica_count",
+      "pool": "any",
+      "authority": "operator",
+      "depth_frac_per_replica": {"value": 0.63, "status": "estimated", "note": "same as drain for that pool's GPU; the GPU parks, the node stays"},
+      "ramp_s":       {"value": 90,   "status": "estimated", "note": "pod termination + drain"},
+      "recovery_s":   {"value": 120,  "status": "estimated", "note": "model reload"},
+      "delta_p99_premium_ms": {"value": null, "status": "estimated", "note": "depends on remaining capacity vs load; E1 curve"}
+    },
+    {
+      "name": "batch_cap",
+      "pool": "decode",
+      "authority": "operator",
+      "depth_frac":   {"value": 0.15, "status": "measured", "note": "177 -> 214 W across batch 1..32; efficiency lever"},
+      "ramp_s":       {"value": 120,  "status": "estimated", "note": "restart-only flag"},
+      "role": "efficiency, not power"
+    },
+    {
+      "name": "sleep_wake",
+      "pool": "any",
+      "authority": "operator",
+      "depth_frac":   {"value": 0.05, "status": "estimated", "note": "parked 43 W -> ~30 W"},
+      "ramp_s":       {"value": 3,    "status": "estimated"},
+      "recovery_s":   {"value": 5,    "status": "estimated"}
+    },
+    {
+      "name": "gpu_power_cap",
+      "pool": "prefill",
+      "authority": "root",
+      "scope": "out of scope for both projects",
+      "depth_frac":   {"value": 0.08, "status": "measured", "note": "already binding 90% of prefill samples at 250 W; settable floor 150 W; no-op on decode above ~200 W"}
+    }
+  ]
+}
