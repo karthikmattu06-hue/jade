@@ -1,0 +1,21 @@
+t_wall,shed,mode,inflight,held,note
+1792835505.7853,,reject,0,0,proxy start
+1792835507.1644,,reject,0,0,e3 start: clear
+1792835602.6474,flex,reject,2,0,ev01 start shed_reject @ 2 rps
+1792835722.6483,,reject,0,0,ev01 release
+1792835876.0863,flex,defer,3,0,ev02 start shed_defer @ 2 rps
+1792835996.0886,,defer,0,103,ev02 release
+1792836151.9041,flex|premium|standard,reject,2,0,ev03 start drain @ 2 rps
+1792836271.9036,,reject,0,0,ev03 release
+1792836443.5019,flex,reject,5,0,ev04 start shed_reject @ 3 rps
+1792836563.5014,,reject,8,0,ev04 release
+1792836745.5165,flex,defer,4,0,ev05 start shed_defer @ 3 rps
+1792836865.5152,,defer,3,136,ev05 release
+1792837069.9605,flex|premium|standard,reject,5,0,ev06 start drain @ 3 rps
+1792837189.9589,,reject,0,0,ev06 release
+1792837401.8963,flex,reject,6,0,ev07 start shed_reject @ 4 rps
+1792837521.8960,,reject,8,0,ev07 release
+1792837675.3605,flex,defer,5,0,ev08 start shed_defer @ 4 rps
+1792837795.3611,,defer,2,146,ev08 release
+1792837956.7709,flex|premium|standard,reject,2,0,ev09 start drain @ 4 rps
+1792838076.7700,,reject,0,0,ev09 release

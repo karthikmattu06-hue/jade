@@ -1,0 +1,54 @@
+trace: 19366 requests; median prompt 1020 tok, median output 129 tok; tier mix [1, 1, 1]
+  phase idle_pre       30.0 s
+  phase rate_0.5       60.0 s
+  phase tail_0.5        0.0 s
+    33 requests, 1 clipped, 0 cut at tail limit
+  phase gap_0.5        15.0 s
+  phase rate_1         60.0 s
+  phase tail_1          0.0 s
+    59 requests, 2 clipped, 0 cut at tail limit
+  phase gap_1          15.0 s
+  phase rate_2         60.0 s
+  phase tail_2          0.4 s
+    113 requests, 6 clipped, 0 cut at tail limit
+  phase gap_2          15.0 s
+  phase rate_4         60.0 s
+  phase tail_4          2.8 s
+    251 requests, 10 clipped, 0 cut at tail limit
+  phase gap_4          15.0 s
+  phase rate_8         60.0 s
+  phase tail_8         14.9 s
+    505 requests, 32 clipped, 0 cut at tail limit
+  phase gap_8          15.0 s
+  phase rate_16        60.0 s
+  phase tail_16        60.0 s
+    931 requests, 46 clipped, 210 cut at tail limit
+  phase gap_16         15.0 s
+  phase idle_post      30.0 s
+
+ rate tier         n   ok%  TTFT p50  TTFT p99  TPOT p50  TPOT p99  lag max   (ms)
+  0.5 premium      8 100.0     135.7     513.1      4.62      5.80      9.1
+  0.5 standard    12 100.0     164.3    1893.4      4.38      4.99      2.6
+  0.5 flex        13 100.0     159.5     297.6      4.41      5.40      5.7
+  0.5 all         33 100.0     161.5    1893.4      4.49      5.80      9.1
+    1 premium     19 100.0     173.3     476.7      4.28      4.69      1.9
+    1 standard    16 100.0     201.4     626.6      4.49      4.84      2.2
+    1 flex        24 100.0     144.3     433.0      4.38      5.42      2.5
+    1 all         59 100.0     162.9     626.6      4.36      5.42      2.5
+    2 premium     43 100.0     152.8     600.6      4.30      5.33      2.5
+    2 standard    32 100.0     181.8     814.3      4.29      4.62      1.3
+    2 flex        38 100.0     166.3     783.9      4.29      5.67      2.5
+    2 all        113 100.0     159.8     783.9      4.30      5.33      2.5
+    4 premium     79 100.0     209.2    2133.3      4.35      5.77      3.0
+    4 standard    91 100.0     221.3    1981.0      4.34      5.33      1.5
+    4 flex        81 100.0     186.4     872.2      4.30      5.42      1.1
+    4 all        251 100.0     213.3    1193.0      4.33      5.42      3.0
+    8 premium    167 100.0    4051.9   21633.1      4.76      7.37      1.4
+    8 standard   151 100.0    4137.0   23099.7      4.72      6.94      1.1
+    8 flex       187 100.0    3906.5   23300.6      4.68      7.51      2.0
+    8 all        505 100.0    4040.1   23030.9      4.71      7.32      2.0
+   16 premium    329  79.6   65150.5       inf      8.93       inf      2.4
+   16 standard   295  75.6   66299.6       inf      9.86       inf     19.3
+   16 flex       307  76.9   64563.7       inf      8.79       inf      3.6
+   16 all        931  77.4   65381.2       inf      9.15       inf     19.3
+wrote /home/km5503/jade/disagg/logs_21928556/e1_phases.csv and e1_requests.csv

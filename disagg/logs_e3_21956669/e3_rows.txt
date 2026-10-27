@@ -1,0 +1,20 @@
+ev    kind        rps pool     Pbase  Phold  depth  speed     dur dTTFTprem flexSrv  recov  rec90  rebnd
+ev01  shed_reject   2 prefill   46.7   43.1  0.014      -    120+       184    0.00    1.2      -  0.154
+ev01  shed_reject   2 decode   174.3  145.5  0.115   3.75    120+       184    0.00    0.6    0.7  0.118
+ev02  shed_defer    2 prefill   46.9   43.5  0.014      -      50      2565    1.00   16.7      -  0.812
+ev02  shed_defer    2 decode   168.3  145.1  0.093   0.74      50      2565    1.00    1.4    1.7  0.236
+ev03  drain         2 prefill   46.7   37.0  0.039   0.03       -     23837    0.02   13.4    0.1  0.225
+ev03  drain         2 decode   177.7   33.9  0.575   2.18       -     23837    0.02   15.5   15.5  0.131
+ev04  shed_reject   3 prefill   57.0   46.4  0.042   0.56     110      2408    0.06    1.4    0.0  0.356
+ev04  shed_reject   3 decode   166.9  155.7  0.045   0.01     110      2408    0.06    0.8    0.9  0.176
+ev05  shed_defer    3 prefill   47.2   47.6 -0.002      -     110     38417    1.00   37.1      -  0.804
+ev05  shed_defer    3 decode   146.0  153.7 -0.031      -     110     38417    1.00      -      -  0.331
+ev06  drain         3 prefill   47.5   36.9  0.042   0.22       -      7972    0.05   21.1    0.0  0.271
+ev06  drain         3 decode   177.8   33.9  0.576   3.57       -      7972    0.05   17.8    1.8  0.115
+ev07  shed_reject   4 prefill   57.1   50.2  0.028   0.04    117+     -3822    0.00    0.7    1.1  0.402
+ev07  shed_reject   4 decode   184.5  187.2 -0.011      -    117+     -3822    0.00    0.0      -  0.120
+ev08  shed_defer    4 prefill   52.3   53.0 -0.003      -      40     -1442    1.00   59.2      -  0.797
+ev08  shed_defer    4 decode   191.4  180.3  0.044   2.45      40     -1442    1.00   58.2    0.0  0.068
+ev09  drain         4 prefill   62.9   37.1  0.103   0.03       -         -    0.00    0.8    0.8  0.199
+ev09  drain         4 decode   183.9   34.0  0.600   2.38       -         -    0.00    1.8    1.8  0.090
+wrote /home/km5503/jade/disagg/logs_e3_21956669/e3_rows.csv and e3_rows.json   ('+' on duration = lower bound: no SLO broke in the hold)

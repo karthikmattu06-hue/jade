@@ -1,0 +1,3 @@
+[sampler] gpu 0 role=mono bus=00000000:5E:00.0 limit=250 W instant-power field: yes
+[sampler] 20 Hz -> /home/km5503/jade/disagg/logs_mono_21951870/e1_power.csv
+[sampler] stopped after 7191 ticks (20.0 Hz achieved)

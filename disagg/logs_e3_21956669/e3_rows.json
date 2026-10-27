@@ -1,0 +1,1814 @@
+[
+ {
+  "name": "admission_by_tier",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 2.0,
+   "pool_busy_frac": 0.187,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev01"
+  },
+  "depth_frac": {
+   "value": 0.014,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": null,
+   "status": "n/a"
+  },
+  "duration_s": {
+   "value": 120.0,
+   "status": "measured",
+   "bound": "lower"
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 183.5,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 1.12,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 379.0,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 1.42,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 1.24,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.154,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 7.2,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -118.70000000000005,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 2.0,
+   "pool_busy_frac": 0.697,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev01"
+  },
+  "depth_frac": {
+   "value": 0.115,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 3.75,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": 120.0,
+   "status": "measured",
+   "bound": "lower"
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 183.5,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 1.12,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 379.0,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 1.42,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 0.59,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.118,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 23.9,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -118.70000000000005,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "defer"
+  },
+  "at_load": {
+   "rate_rps": 2.0,
+   "pool_busy_frac": 0.188,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev02"
+  },
+  "depth_frac": {
+   "value": 0.014,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": null,
+   "status": "n/a"
+  },
+  "duration_s": {
+   "value": 50.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 2565.2000000000003,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.33999999999999986,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 462.3000000000002,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.9099999999999993,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 127794.79999999999,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.5700000000000003,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 16.7,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.812,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 8.9,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 13076.3,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "defer"
+  },
+  "at_load": {
+   "rate_rps": 2.0,
+   "pool_busy_frac": 0.673,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev02"
+  },
+  "depth_frac": {
+   "value": 0.093,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.74,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": 50.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 2565.2000000000003,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.33999999999999986,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 462.3000000000002,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.9099999999999993,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 127794.79999999999,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.5700000000000003,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 1.45,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.236,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 29.7,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 13076.3,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "drain_to_parked",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "premium",
+    "standard",
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 2.0,
+   "pool_busy_frac": 0.187,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev03"
+  },
+  "depth_frac": {
+   "value": 0.039,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.03,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": null,
+   "status": "n/a",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 23837.0,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.8099999999999996,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.07446808510638298,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 23450.0,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.10000000000000053,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.0273972602739726,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 24137.8,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.7000000000000002,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.021739130434782608,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 13.36,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.225,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 7.8,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 11712.3,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "drain_to_parked",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "premium",
+    "standard",
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 2.0,
+   "pool_busy_frac": 0.711,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev03"
+  },
+  "depth_frac": {
+   "value": 0.575,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 2.18,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": null,
+   "status": "n/a",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 23837.0,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.8099999999999996,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.07446808510638298,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 23450.0,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.10000000000000053,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.0273972602739726,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 24137.8,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.7000000000000002,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.021739130434782608,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 15.51,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.131,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 2.4,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 11712.3,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 3.0,
+   "pool_busy_frac": 0.228,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev04"
+  },
+  "depth_frac": {
+   "value": 0.042,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.56,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": 110.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 2408.2000000000007,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -9.120000000000001,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 882.6000000000004,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -29.729999999999997,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 5116.7,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -11.02,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.05825242718446602,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 1.41,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.356,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 9.8,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -746.9999999999995,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 3.0,
+   "pool_busy_frac": 0.668,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev04"
+  },
+  "depth_frac": {
+   "value": 0.045,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.01,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": 110.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 2408.2000000000007,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -9.120000000000001,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 882.6000000000004,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -29.729999999999997,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 5116.7,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -11.02,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.05825242718446602,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 0.76,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.176,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 42.8,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -746.9999999999995,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "defer"
+  },
+  "at_load": {
+   "rate_rps": 3.0,
+   "pool_busy_frac": 0.189,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev05"
+  },
+  "depth_frac": {
+   "value": -0.002,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": null,
+   "status": "n/a"
+  },
+  "duration_s": {
+   "value": 110.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 38416.700000000004,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.6099999999999994,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.9919354838709677,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 40154.7,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 43.17999999999999,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.9927007299270073,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": -Infinity,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -Infinity,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 37.14,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.804,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 18.3,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 33197.9,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "defer"
+  },
+  "at_load": {
+   "rate_rps": 3.0,
+   "pool_busy_frac": 0.584,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev05"
+  },
+  "depth_frac": {
+   "value": -0.031,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": null,
+   "status": "n/a"
+  },
+  "duration_s": {
+   "value": 110.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 38416.700000000004,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.6099999999999994,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.9919354838709677,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 40154.7,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 43.17999999999999,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.9927007299270073,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": -Infinity,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -Infinity,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": null,
+    "status": "n/a"
+   },
+   "rebound_frac": {
+    "value": 0.331,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 35.8,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 33197.9,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "drain_to_parked",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "premium",
+    "standard",
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 3.0,
+   "pool_busy_frac": 0.19,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev06"
+  },
+  "depth_frac": {
+   "value": 0.042,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.22,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": null,
+   "status": "n/a",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 7972.5,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.8699999999999992,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.0379746835443038,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 8932.4,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.75,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.039473684210526314,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 7288.200000000001,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.9199999999999999,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.05172413793103448,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 21.11,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.271,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 13.5,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 326.4000000000001,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "drain_to_parked",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "premium",
+    "standard",
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 3.0,
+   "pool_busy_frac": 0.711,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev06"
+  },
+  "depth_frac": {
+   "value": 0.576,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 3.57,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": null,
+   "status": "n/a",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": 7972.5,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.8699999999999992,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.0379746835443038,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 8932.4,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.75,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.039473684210526314,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 7288.200000000001,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.9199999999999999,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 0.05172413793103448,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 17.81,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.115,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 4.2,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 326.4000000000001,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 4.0,
+   "pool_busy_frac": 0.229,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev07"
+  },
+  "depth_frac": {
+   "value": 0.028,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.04,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": 117.3,
+   "status": "measured",
+   "bound": "lower"
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": -3821.8999999999996,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -7.010000000000001,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": -3731.5,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -0.4800000000000004,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 0.68,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.402,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 14.2,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -3272.7999999999997,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 4.0,
+   "pool_busy_frac": 0.738,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev07"
+  },
+  "depth_frac": {
+   "value": -0.011,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": null,
+   "status": "n/a"
+  },
+  "duration_s": {
+   "value": 117.3,
+   "status": "measured",
+   "bound": "lower"
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": -3821.8999999999996,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -7.010000000000001,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": -3731.5,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": -0.4800000000000004,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 0.03,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.12,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 22.0,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -3272.7999999999997,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "defer"
+  },
+  "at_load": {
+   "rate_rps": 4.0,
+   "pool_busy_frac": 0.209,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev08"
+  },
+  "depth_frac": {
+   "value": -0.003,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": null,
+   "status": "n/a"
+  },
+  "duration_s": {
+   "value": 40.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": -1441.8000000000002,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.13999999999999968,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 1050.0999999999995,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.34999999999999964,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 38245.399999999994,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 1.12,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 59.21,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.797,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 24.0,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 49503.0,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "admission_by_tier",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "flex"
+   ],
+   "mode": "defer"
+  },
+  "at_load": {
+   "rate_rps": 4.0,
+   "pool_busy_frac": 0.766,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev08"
+  },
+  "depth_frac": {
+   "value": 0.044,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 2.45,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": 40.0,
+   "status": "measured",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": -1441.8000000000002,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.13999999999999968,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": 1050.0999999999995,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 0.34999999999999964,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": 38245.399999999994,
+     "status": "measured"
+    },
+    "d_tpot_p99_ms": {
+     "value": 1.12,
+     "status": "measured"
+    },
+    "served_frac": {
+     "value": 1.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 58.16,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.068,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 0.5,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": 49503.0,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "drain_to_parked",
+  "pool": "prefill",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "premium",
+    "standard",
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 4.0,
+   "pool_busy_frac": 0.252,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev09"
+  },
+  "depth_frac": {
+   "value": 0.103,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 0.03,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": null,
+   "status": "n/a",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 0.75,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.199,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 9.1,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -1421.0,
+    "status": "measured"
+   }
+  }
+ },
+ {
+  "name": "drain_to_parked",
+  "pool": "decode",
+  "authority": "operator",
+  "setting": {
+   "shed": [
+    "premium",
+    "standard",
+    "flex"
+   ],
+   "mode": "reject"
+  },
+  "at_load": {
+   "rate_rps": 4.0,
+   "pool_busy_frac": 0.736,
+   "tier_mix": {
+    "premium": 0.333,
+    "standard": 0.333,
+    "flex": 0.334
+   },
+   "status": "measured"
+  },
+  "source_hardware": {
+   "ref": "sporc_a100_pcie_disagg",
+   "event": "ev09"
+  },
+  "depth_frac": {
+   "value": 0.6,
+   "status": "measured"
+  },
+  "speed_s": {
+   "value": 2.38,
+   "status": "measured"
+  },
+  "duration_s": {
+   "value": null,
+   "status": "n/a",
+   "bound": null
+  },
+  "cost": {
+   "premium": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   },
+   "standard": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   },
+   "flex": {
+    "d_ttft_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "d_tpot_p99_ms": {
+     "value": null,
+     "status": "n/a"
+    },
+    "served_frac": {
+     "value": 0.0,
+     "status": "measured"
+    }
+   }
+  },
+  "release": {
+   "recovery_s": {
+    "value": 1.75,
+    "status": "measured"
+   },
+   "rebound_frac": {
+    "value": 0.09,
+    "status": "measured"
+   },
+   "rebound_s": {
+    "value": 4.7,
+    "status": "measured"
+   },
+   "d_ttft_p99_after_ms": {
+    "value": -1421.0,
+    "status": "measured"
+   }
+  }
+ }
+]

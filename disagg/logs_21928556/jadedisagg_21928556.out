@@ -1,0 +1,155 @@
+>>> node: skl-a-56.rc.rit.edu  job: 21928556  connector: nixl  started: Mon Oct 19 10:57:23 PM EDT 2026
+>>> vllm: 0.28.0
+>>> nixl: import ok
+>>> proxy script: present (290 lines)
+index, name, pci.bus_id, power.limit [W]
+0, NVIDIA A100-PCIE-40GB, 00000000:5E:00.0, 250.00 W
+1, NVIDIA A100-PCIE-40GB, 00000000:86:00.0, 250.00 W
+	[4mGPU0	GPU1	NIC0	NIC1	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	SYS	NODE	NODE	0-2,4,6-7	0		N/A
+GPU1	SYS	 X 	SYS	SYS	18-23	1		N/A
+NIC0	NODE	SYS	 X 	PIX				
+NIC1	NODE	SYS	PIX	 X 				
+
+[sampler] gpu 0 role=prefill bus=00000000:5E:00.0 limit=250 W instant-power field: yes
+[sampler] gpu 1 role=decode bus=00000000:86:00.0 limit=250 W instant-power field: yes
+[sampler] 20 Hz -> /home/km5503/jade/disagg/logs_21928556/power.csv
+>>> prefill instance up (GPU 0)
+>>> decode instance up (GPU 1)
+>>> proxy up on :8192
+>>> sending 1 request through proxy :8192
+------------------------------------------------------------------
+HTTP 200   wall 2.41 s
+text: 1. **Understanding Memory Bandwidth and Arithmetic Operations:**    - **Memory Bandwidth:** This refers to the maximum rate at which data can be transferred between the CPU or GPU and main memory (RAM
+prefill log shows request activity : 1 (informational)
+decode  log shows request activity : 1 (informational)
+NIXL handshake logged on decode    : 1 (expect 1 with connector=nixl)
+KV transfer errors in decode log   : 0 (must be 0)
+RESULT: PASS -- two pools on two GPUs with KV handoff (nixl). Jade is a go for DSCI-650.
+------------------------------------------------------------------
+  phase idle_pre    30.0 s
+  phase disagg      25.6 s
+  phase gap         10.0 s
+  phase mono        24.8 s
+  phase idle_post   30.0 s
+disaggregated (proxy)          TTFT median    75.4 ms  p90    81.0 ms   total median  1276.5 ms   (n=20)
+monolithic (decode GPU only)   TTFT median    41.2 ms  p90    42.0 ms   total median  1231.5 ms   (n=20)
+
+KV-handoff tax on this prompt (median TTFT difference): 34.1 ms
+21 Sep reference (skl-a-54, eager): 75.1 vs 41.3 ms -> +33.8 ms
+wrote /home/km5503/jade/disagg/logs_21928556/phases.csv and /home/km5503/jade/disagg/logs_21928556/requests.csv
+[sampler] stopped after 7241 ticks (19.9 Hz achieved)
+------------------------------------------------------------------
+phase      gpu role        sec  mean_W  inst_W  energy_J  pcap%  SM_MHz temp_C
+idle_pre     0 prefill    30.0    38.4    38.4    1146.0    0.0     765   31.0
+idle_pre     1 decode     30.0    36.7    36.7    1093.0    0.0     765   32.0
+disagg       0 prefill    25.6    38.8    38.8     985.0    0.0     765   31.0
+disagg       1 decode     25.6    57.0    57.0    1456.8    0.0     765   33.1
+gap          0 prefill    10.0    38.4    38.4     380.7    0.0     765   31.0
+gap          1 decode     10.0    37.2    37.2     367.5    0.0     765   33.0
+mono         0 prefill    24.8    38.4    38.4     945.8    0.0     765   31.0
+mono         1 decode     24.8    57.9    57.9    1430.9    0.0     765   33.9
+idle_post    0 prefill    30.0    38.3    38.3    1145.4    0.0     765   31.0
+idle_post    1 decode     30.0    37.0    37.0    1104.0    0.0     765   33.1
+wrote /home/km5503/jade/disagg/logs_21928556/power_trace.png
+==================================================================
+>>> E1: restarting both pools with CUDA graphs (no --enforce-eager)
+>>> GPU memory after stop: 0 MiB (max of the two)
+>>> prefill up (graphs)
+>>> decode up (graphs)
+trace: 19366 requests; median prompt 1020 tok, median output 129 tok; tier mix [1, 1, 1]
+  phase idle_pre       30.0 s
+  phase rate_0.5       60.0 s
+  phase tail_0.5        0.0 s
+    33 requests, 1 clipped, 0 cut at tail limit
+  phase gap_0.5        15.0 s
+  phase rate_1         60.0 s
+  phase tail_1          0.0 s
+    59 requests, 2 clipped, 0 cut at tail limit
+  phase gap_1          15.0 s
+  phase rate_2         60.0 s
+  phase tail_2          0.4 s
+    113 requests, 6 clipped, 0 cut at tail limit
+  phase gap_2          15.0 s
+  phase rate_4         60.0 s
+  phase tail_4          2.8 s
+    251 requests, 10 clipped, 0 cut at tail limit
+  phase gap_4          15.0 s
+  phase rate_8         60.0 s
+  phase tail_8         14.9 s
+    505 requests, 32 clipped, 0 cut at tail limit
+  phase gap_8          15.0 s
+  phase rate_16        60.0 s
+  phase tail_16        60.0 s
+    931 requests, 46 clipped, 210 cut at tail limit
+  phase gap_16         15.0 s
+  phase idle_post      30.0 s
+
+ rate tier         n   ok%  TTFT p50  TTFT p99  TPOT p50  TPOT p99  lag max   (ms)
+  0.5 premium      8 100.0     135.7     513.1      4.62      5.80      9.1
+  0.5 standard    12 100.0     164.3    1893.4      4.38      4.99      2.6
+  0.5 flex        13 100.0     159.5     297.6      4.41      5.40      5.7
+  0.5 all         33 100.0     161.5    1893.4      4.49      5.80      9.1
+    1 premium     19 100.0     173.3     476.7      4.28      4.69      1.9
+    1 standard    16 100.0     201.4     626.6      4.49      4.84      2.2
+    1 flex        24 100.0     144.3     433.0      4.38      5.42      2.5
+    1 all         59 100.0     162.9     626.6      4.36      5.42      2.5
+    2 premium     43 100.0     152.8     600.6      4.30      5.33      2.5
+    2 standard    32 100.0     181.8     814.3      4.29      4.62      1.3
+    2 flex        38 100.0     166.3     783.9      4.29      5.67      2.5
+    2 all        113 100.0     159.8     783.9      4.30      5.33      2.5
+    4 premium     79 100.0     209.2    2133.3      4.35      5.77      3.0
+    4 standard    91 100.0     221.3    1981.0      4.34      5.33      1.5
+    4 flex        81 100.0     186.4     872.2      4.30      5.42      1.1
+    4 all        251 100.0     213.3    1193.0      4.33      5.42      3.0
+    8 premium    167 100.0    4051.9   21633.1      4.76      7.37      1.4
+    8 standard   151 100.0    4137.0   23099.7      4.72      6.94      1.1
+    8 flex       187 100.0    3906.5   23300.6      4.68      7.51      2.0
+    8 all        505 100.0    4040.1   23030.9      4.71      7.32      2.0
+   16 premium    329  79.6   65150.5       inf      8.93       inf      2.4
+   16 standard   295  75.6   66299.6       inf      9.86       inf     19.3
+   16 flex       307  76.9   64563.7       inf      8.79       inf      3.6
+   16 all        931  77.4   65381.2       inf      9.15       inf     19.3
+wrote /home/km5503/jade/disagg/logs_21928556/e1_phases.csv and e1_requests.csv
+[sampler] stopped after 14186 ticks (19.8 Hz achieved)
+phase      gpu role        sec  mean_W  inst_W  energy_J  pcap%  SM_MHz temp_C
+idle_pre     0 prefill    30.0    38.4    38.4    1147.1    0.0     765   31.0
+idle_pre     1 decode     30.0    38.7    38.7    1141.8    0.0     804   32.7
+rate_0.5     0 prefill    60.0    40.3    40.3    2405.5    0.0     779   31.1
+rate_0.5     1 decode     60.0    96.7    96.7    5769.6    0.0    1187   37.2
+gap_0.5      0 prefill    15.0    38.5    38.5     569.9    0.0     765   31.0
+gap_0.5      1 decode     15.0    41.5    41.5     605.5    0.0     841   38.4
+rate_1       0 prefill    60.0    43.4    43.4    2581.0    0.0     823   31.8
+rate_1       1 decode     60.0   150.8   150.8    9042.8    0.0    1376   46.1
+gap_1        0 prefill    15.0    38.7    38.7     575.0    0.0     765   31.6
+gap_1        1 decode     15.0    43.9    43.9     651.4    0.0     840   43.9
+rate_2       0 prefill    60.0    46.0    46.0    2813.6    0.5     857   32.2
+rate_2       1 decode     60.0   168.8   168.8   10153.3    0.0    1386   51.2
+tail_2       0 prefill     0.4    45.4    45.4      16.0    0.0     765   32.0
+tail_2       1 decode      0.4   172.0   172.0      73.8    0.0    1410   52.4
+gap_2        0 prefill    15.0    38.7    38.7     576.6    0.0     765   32.0
+gap_2        1 decode     15.0    45.5    45.5     666.9    0.0     848   46.6
+rate_4       0 prefill    60.0    62.2    62.2    3621.9    4.5    1015   33.6
+rate_4       1 decode     60.0   204.1   204.1   12023.1    0.0    1403   55.9
+tail_4       0 prefill     2.8    39.1    39.1      78.9    0.0     765   33.0
+tail_4       1 decode      2.8   196.0   196.0     391.2    0.0    1410   59.4
+gap_4        0 prefill    15.0    39.1    39.1     584.0    0.0     765   33.0
+gap_4        1 decode     15.0    47.0    47.0     691.1    0.0     851   50.4
+rate_8       0 prefill    60.0    95.9    95.9    5900.1   26.3    1280   37.8
+rate_8       1 decode     60.0   200.2   200.2   12067.7    0.0    1401   57.2
+tail_8       0 prefill    14.9    43.6    43.6     638.9    0.0     823   35.8
+tail_8       1 decode     14.9   218.9   218.9    3279.9   16.1    1405   61.2
+gap_8        0 prefill    15.0    39.7    39.7     592.2    0.0     765   34.2
+gap_8        1 decode     15.0    47.8    47.8     702.8    0.0     842   51.5
+rate_16      0 prefill    60.0   116.6   116.6    6904.7   42.7    1210   41.0
+rate_16      1 decode     60.0   164.4   164.4    9925.4    0.0    1402   54.6
+tail_16      0 prefill    60.0    55.9    55.9    3361.3    6.8     830   36.0
+tail_16      1 decode     60.0   169.1   169.1   10135.0    8.9    1398   55.0
+gap_16       0 prefill    15.0    39.6    39.6     587.2    0.0     765   33.2
+gap_16       1 decode     15.0    56.6    56.6     835.9    0.7     881   48.8
+idle_post    0 prefill    30.0    39.0    39.0    1161.8    0.0     765   32.4
+idle_post    1 decode     30.0    39.6    39.6    1180.9    0.0     765   42.1
+wrote /home/km5503/jade/disagg/logs_21928556/e1_power_trace.png
+>>> logs: /home/km5503/jade/disagg/logs_21928556  (power.csv, phases.csv, requests.csv, power_trace.png if plotted)
+>>> finished: Mon Oct 19 11:16:52 PM EDT 2026
+>>> cleanup

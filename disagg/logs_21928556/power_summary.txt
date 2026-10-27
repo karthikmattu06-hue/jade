@@ -1,0 +1,12 @@
+phase      gpu role        sec  mean_W  inst_W  energy_J  pcap%  SM_MHz temp_C
+idle_pre     0 prefill    30.0    38.4    38.4    1146.0    0.0     765   31.0
+idle_pre     1 decode     30.0    36.7    36.7    1093.0    0.0     765   32.0
+disagg       0 prefill    25.6    38.8    38.8     985.0    0.0     765   31.0
+disagg       1 decode     25.6    57.0    57.0    1456.8    0.0     765   33.1
+gap          0 prefill    10.0    38.4    38.4     380.7    0.0     765   31.0
+gap          1 decode     10.0    37.2    37.2     367.5    0.0     765   33.0
+mono         0 prefill    24.8    38.4    38.4     945.8    0.0     765   31.0
+mono         1 decode     24.8    57.9    57.9    1430.9    0.0     765   33.9
+idle_post    0 prefill    30.0    38.3    38.3    1145.4    0.0     765   31.0
+idle_post    1 decode     30.0    37.0    37.0    1104.0    0.0     765   33.1
+wrote /home/km5503/jade/disagg/logs_21928556/power_trace.png

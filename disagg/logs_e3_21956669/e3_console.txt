@@ -1,0 +1,10 @@
+  ev01 shed_reject 2 rps | premium p99 TTFT base      797 hold      980 after      678 ms | flex in hold: 0/82 served | 0 cut
+  ev02 shed_defer  2 rps | premium p99 TTFT base      983 hold     3548 after    14059 ms | flex in hold: 105/105 served | 0 cut
+  ev03 drain       2 rps | premium p99 TTFT base     1227 hold    25064 after    12939 ms | flex in hold: 2/92 served | 0 cut
+  ev04 shed_reject 3 rps | premium p99 TTFT base     4766 hold     7175 after     4019 ms | flex in hold: 6/103 served | 0 cut
+  ev05 shed_defer  3 rps | premium p99 TTFT base     8850 hold    47267 after    42048 ms | flex in hold: 138/138 served | 0 cut
+  ev06 drain       3 rps | premium p99 TTFT base     1024 hold     8997 after     1350 ms | flex in hold: 6/116 served | 0 cut
+  ev07 shed_reject 4 rps | premium p99 TTFT base     5737 hold     1915 after     2464 ms | flex in hold: 0/149 served | 0 cut
+  ev08 shed_defer  4 rps | premium p99 TTFT base     4138 hold     2696 after    53641 ms | flex in hold: 145/145 served | 0 cut
+  ev09 drain       4 rps | premium p99 TTFT base     3215 hold      nan after     1794 ms | flex in hold: 0/146 served | 0 cut
+wrote /home/km5503/jade/disagg/logs_e3_21956669/e3_events.csv, e3_phases.csv, e3_requests.csv

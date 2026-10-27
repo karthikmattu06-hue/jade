@@ -1,0 +1,11 @@
+  phase idle_pre    30.0 s
+  phase disagg      25.6 s
+  phase gap         10.0 s
+  phase mono        24.8 s
+  phase idle_post   30.0 s
+disaggregated (proxy)          TTFT median    75.4 ms  p90    81.0 ms   total median  1276.5 ms   (n=20)
+monolithic (decode GPU only)   TTFT median    41.2 ms  p90    42.0 ms   total median  1231.5 ms   (n=20)
+
+KV-handoff tax on this prompt (median TTFT difference): 34.1 ms
+21 Sep reference (skl-a-54, eager): 75.1 vs 41.3 ms -> +33.8 ms
+wrote /home/km5503/jade/disagg/logs_21928556/phases.csv and /home/km5503/jade/disagg/logs_21928556/requests.csv

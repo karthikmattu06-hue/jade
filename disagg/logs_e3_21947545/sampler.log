@@ -1,0 +1,4 @@
+[sampler] gpu 0 role=prefill bus=00000000:3B:00.0 limit=250 W instant-power field: yes
+[sampler] gpu 1 role=decode bus=00000000:5E:00.0 limit=250 W instant-power field: yes
+[sampler] 20 Hz -> /home/km5503/jade/disagg/logs_e3_21947545/e3_power.csv
+[sampler] stopped after 7214 ticks (19.9 Hz achieved)
