@@ -17,12 +17,21 @@ THE LEVER
                      datasheet's "release" row measures (the Phoenix utility terms
                      ask for "no snap-back"). Reject vs defer is a real policy
                      choice for an operator, so E3 measures both.
+  RAMPED RELEASE (added 11 Nov 2026): end a defer event with
+                    {"shed": [], "ramp_s": 30}
+                   and the held requests are let go one by one, spaced evenly
+                   over 30 s, oldest first, instead of all at once. E3 on SPORC
+                   showed the all-at-once release spikes the prefill GPU to
+                   ~250 W; a ramp is the obvious answer, and this measures it.
+                   New requests arriving during the ramp pass straight through
+                   (the event is over); only the backlog is metered.
   Shedding every tier ("shed": ["premium","standard","flex"]) is a full DRAIN:
   new work stops, in-flight requests finish, both pools fall to parked power.
 
 CONTROL (the event driver or you, with curl)
     curl -s -X POST localhost:8300/control -d '{"shed":["flex"],"mode":"defer","note":"event start"}'
     curl -s -X POST localhost:8300/control -d '{"shed":[],"note":"event end"}'
+    curl -s -X POST localhost:8300/control -d '{"shed":[],"ramp_s":30,"note":"event end, ramped"}'
     curl -s localhost:8300/state
   Every command is written to commands.csv with a wall-clock timestamp (same
   clock as the power sampler): "command at t" -> "power settled at t + x" is
@@ -37,7 +46,7 @@ STREAMING
   buffered, so time-to-first-token is not inflated by this hop. The hop itself
   costs a local HTTP round trip (well under 1 ms); E2 measures it.
 """
-import argparse, asyncio, csv, json, os, time
+import argparse, asyncio, collections, csv, json, os, time
 
 from aiohttp import ClientSession, ClientTimeout, TCPConnector, web
 
@@ -47,7 +56,11 @@ TIERS = ("premium", "standard", "flex")
 class State:
     def __init__(self, log_dir, max_hold_s):
         self.shed, self.mode = set(), "reject"
-        self.release = asyncio.Event(); self.release.set()   # set = no event active
+        # Each held request parks on its own Future in this FIFO queue. Releasing
+        # = resolving futures: all at once (instant release) or one per interval
+        # (ramped release). A plain asyncio.Event could only do "all at once".
+        self.queue = collections.deque()
+        self.ramp_task = None
         self.inflight = self.held = 0
         self.max_hold_s = max_hold_s
         os.makedirs(log_dir, exist_ok=True)
@@ -64,9 +77,7 @@ class State:
 
     def log_adm(self, t_in, tier, decision, hold_s):
         self.adm.writerow([f"{t_in:.4f}", tier, decision, f"{hold_s * 1000:.1f}"])
-        self._n += 1
-        if self._n % 50 == 0:
-            self._af.flush()
+        self._af.flush()        # every row: a killed proxy must not lose the tail (~30 rows/s at most, cheap)
 
     def close(self):
         self._cf.close(); self._af.close()
@@ -76,6 +87,29 @@ class State:
                 "inflight": self.inflight, "held": self.held, "t_wall": time.time()}
 
 
+def release_all(st):
+    """Resolve every waiting future: all held requests proceed now."""
+    while st.queue:
+        fut = st.queue.popleft()
+        if not fut.done():
+            fut.set_result(True)
+
+
+async def ramp_release(st, ramp_s):
+    """Let the backlog go one request at a time, evenly spaced over ramp_s.
+    The spacing is fixed when the ramp starts (backlog size / ramp length)."""
+    n = len(st.queue)
+    gap = ramp_s / n
+    for _ in range(n):
+        while st.queue and st.queue[0].done():       # skip requests that already timed out
+            st.queue.popleft()
+        if not st.queue:
+            break
+        st.queue.popleft().set_result(True)
+        await asyncio.sleep(gap)
+    release_all(st)             # anything that slipped in meanwhile (should be none)
+
+
 async def control(request):
     """POST {"shed": [...], "mode": "reject"|"defer", "note": "..."} -- apply and log."""
     st = request.app["st"]
@@ -83,15 +117,19 @@ async def control(request):
         cmd = await request.json()
         shed = set(cmd.get("shed", []))
         mode = cmd.get("mode", st.mode)
-        assert shed <= set(TIERS) and mode in ("reject", "defer")
+        ramp_s = float(cmd.get("ramp_s", 0))
+        assert shed <= set(TIERS) and mode in ("reject", "defer") and ramp_s >= 0
     except Exception:
-        return web.json_response({"error": f"bad command; tiers {TIERS}, mode reject|defer"}, status=400)
+        return web.json_response({"error": f"bad command; tiers {TIERS}, mode reject|defer, ramp_s >= 0"}, status=400)
     st.shed, st.mode = shed, mode
-    if shed:
-        st.release.clear()      # held requests now wait
-    else:
-        st.release.set()        # event over: every held request goes at once (the rebound)
-    st.log_cmd(cmd.get("note", ""))
+    if not shed:                # event over: let the backlog go
+        if st.ramp_task and not st.ramp_task.done():
+            st.ramp_task.cancel()                    # a new release replaces an unfinished ramp
+        if ramp_s > 0 and st.queue:
+            st.ramp_task = asyncio.create_task(ramp_release(st, ramp_s))
+        else:
+            release_all(st)     # every held request goes at once (the rebound)
+    st.log_cmd(f"{cmd.get('note', '')}{f' [ramp {ramp_s:g}s, {len(st.queue)} held]' if not shed and ramp_s else ''}")
     print(f"[admission] {time.strftime('%H:%M:%S')} shed={sorted(shed)} mode={mode} "
           f"inflight={st.inflight} held={st.held}", flush=True)
     return web.json_response(st.snapshot())
@@ -112,9 +150,12 @@ async def forward(request):
             st.log_adm(t_in, tier, "reject", 0.0)
             return web.json_response({"error": "shed by jade admission control"}, status=429)
         st.held += 1; m0 = time.perf_counter()
-        try:                                   # wait for the event to end, but not forever
-            await asyncio.wait_for(st.release.wait(), timeout=st.max_hold_s)
+        fut = asyncio.get_running_loop().create_future()
+        st.queue.append(fut)
+        try:                                   # wait for release, but not forever
+            await asyncio.wait_for(asyncio.shield(fut), timeout=st.max_hold_s)
         except asyncio.TimeoutError:
+            fut.cancel()                       # the ramp skips cancelled futures
             st.held -= 1
             st.log_adm(t_in, tier, "defer_timeout", time.perf_counter() - m0)
             return web.json_response({"error": "held past max-hold, dropped"}, status=429)

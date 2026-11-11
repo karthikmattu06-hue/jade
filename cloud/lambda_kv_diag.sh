@@ -97,7 +97,7 @@ run_variant() {         # $1 = label (A/B), $2 = UCX_TLS list
     --gpu-memory-utilization 0.6 --kv-transfer-config "$D_CFG" > "$L/decode.log" 2>&1 &
   local D_PID=$!
   wait_up $PREFILL_PORT $P_PID && wait_up $DECODE_PORT $D_PID \
-    || { echo "!!! variant $V: servers did not start"; tail -25 "$L/prefill.log" "$L/decode.log"; stop_all; return 1; }
+    || { echo "!!! variant $V: servers did not start"; tail -n 25 "$L/prefill.log" "$L/decode.log"; stop_all; return 1; }
   python "$DATA/toy_proxy_server.py" --port $PROXY_PORT \
     --prefiller-hosts localhost --prefiller-ports $PREFILL_PORT \
     --decoder-hosts localhost --decoder-ports $DECODE_PORT > "$L/proxy.log" 2>&1 &
@@ -119,9 +119,10 @@ run_variant() {         # $1 = label (A/B), $2 = UCX_TLS list
   # Which transports did UCX name? Count the mentions in both logs.
   grep -ohiE "cuda_ipc|cuda_copy|tcp|sysv|posix|cma|knem|xpmem" "$L/prefill.log" "$L/decode.log" \
     | tr 'A-Z' 'a-z' | sort | uniq -c > "$L/transports_count.txt"
-  # The protocol table itself (the lines UCX_PROTO_INFO adds).
-  grep -hE "rendezvous|zero-copy|copy-in|copy-out|multi-frag|\| *(tagged|stream|active|remote)" \
-    "$L/decode.log" "$L/prefill.log" | sort -u | head -60 > "$L/ucx_proto.txt"
+  # The protocol table itself (the lines UCX_PROTO_INFO adds). The leading
+  # "[time] [host:pid]" stamp is stripped so identical rows can be counted.
+  grep -hE "\| .*(memory|message|rendezvous|copy)" "$L/decode.log" "$L/prefill.log" \
+    | sed -E 's/^\[[^]]*\] \[[^]]*\] *//' | sort | uniq -c | sort -rn | head -60 > "$L/ucx_proto.txt"
   local ERRS; ERRS=$(grep -E "ERROR|Exception|Traceback" "$L/decode.log" | grep -iE "nixl|kv|transfer|ucx" \
     | grep -vE "non-default args|KVTransferConfig|import_utils" | wc -l)
 
@@ -134,7 +135,10 @@ run_variant() {         # $1 = label (A/B), $2 = UCX_TLS list
 }
 
 run_variant A "tcp,sm,cuda_copy,cuda_ipc"
-run_variant B "sm,cuda_copy,cuda_ipc"
+# Variant B (tcp forbidden) is OFF by default: on the A6000 box (10 Nov) the
+# prefill server would not even start without tcp, and variant A was already
+# fast there. Run it with RUN_B=1 only if A is slow on some machine.
+[ "${RUN_B:-0}" = "1" ] && run_variant B "sm,cuda_copy,cuda_ipc"
 
 echo "=================================================================="
 cat "$OUT/summary.txt"

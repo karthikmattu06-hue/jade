@@ -40,8 +40,19 @@ import argparse, bisect, csv, json, math, os
 SLO_TTFT_MS = {"premium": 2000, "standard": 6000}     # schema v0.3 tiers, status "assumed"
 LEVER = {"shed_reject": ("admission_by_tier", {"shed": ["flex"], "mode": "reject"}),
          "shed_defer":  ("admission_by_tier", {"shed": ["flex"], "mode": "defer"}),
+         "shed_defer_ramp": ("admission_by_tier", {"shed": ["flex"], "mode": "defer", "release": "ramped"}),
          "drain":       ("drain_to_parked", {"shed": ["premium", "standard", "flex"], "mode": "reject"})}
-ROLE = {0: "prefill", 1: "decode"}
+
+
+def lever_of(kind):
+    """Schema lever name + setting for an event kind, including root events
+    named like cap_prefill_225 / clock_decode_810 (see jade_e3.py)."""
+    if kind in LEVER:
+        return LEVER[kind]
+    lever, pool, val = kind.split("_")
+    if lever == "cap":
+        return "power_cap", {"gpu_pool": pool, "cap_w": int(val)}
+    return "sm_clock_lock", {"gpu_pool": pool, "sm_mhz": int(val)}
 HALF_W = 0.25   # smoothing half-width (s): 0.5 s centred window. Wider = less noise but blurs fast drops
                 # (a 1 s window read a 0.45 s synthetic drop as 0.74 s; 0.5 s reads it within ~0.15 s)
 
@@ -95,10 +106,12 @@ def main():
     ap.add_argument("--hardware-ref", default="sporc_a100_pcie_disagg")
     a = ap.parse_args(); NOM = a.nominal_w
     rd = lambda f: list(csv.DictReader(open(os.path.join(a.dir, f))))
+    # Keyed by the sampler's ROLE column (prefill / decode), not the GPU index:
+    # on the 8-GPU box a pair's GPUs are e.g. 4 and 5, not 0 and 1.
     power = {}
     for r in rd("e3_power.csv"):
-        power.setdefault(int(r["gpu"]), ([], []))
-        power[int(r["gpu"])][0].append(float(r["t_wall"])); power[int(r["gpu"])][1].append(float(r["power_w"]))
+        power.setdefault(r["role"], ([], []))
+        power[r["role"]][0].append(float(r["t_wall"])); power[r["role"]][1].append(float(r["power_w"]))
     series = {g: Series(*v) for g, v in power.items()}
     reqs = rd("e3_requests.csv")
     for r in reqs:
@@ -133,7 +146,7 @@ def main():
                 w += 10
         d_after = lat(er, "premium", tr, te, "ttft_ms")[0] - base_p99["premium"]
 
-        for g, s in sorted(series.items()):
+        for g, s in sorted(series.items(), key=lambda kv: kv[0] != "prefill"):
             P_base = mean(s.window(max(t0, tc - 30), tc)[0])   # never reach into the previous event
             hw, _ = s.window(tc + hold / 2, tr); P_hold = mean(hw)
             depth = (P_base - P_hold) / NOM
@@ -159,7 +172,7 @@ def main():
                 rec90 = next((t - tr for p, t in zip(p1, ts) if p >= back), None)
             dt = mean([b - a_ for a_, b in zip(ts, ts[1:])]) if len(ts) > 1 else 0.05
             reb_s = sum(dt for p in p1 if p > P_base + 0.05 * NOM)
-            row = {"event": ev["event"], "rate": rate, "kind": kind, "pool": ROLE.get(g, g),
+            row = {"event": ev["event"], "rate": rate, "kind": kind, "pool": g,
                    "P_base_w": round(P_base, 1), "P_hold_w": round(P_hold, 1),
                    "busy_frac": round(P_base / NOM, 3), "depth_frac": round(depth, 3),
                    "speed_s": None if speed is None else round(speed, 2),
@@ -172,10 +185,10 @@ def main():
                    "rebound_frac": None if rebound is None else round(rebound, 3),
                    "rebound_s": round(reb_s, 1), "d_ttft_p99_after_ms": d_after}
             out_rows.append(row)
-            name, setting = LEVER[kind]
+            name, setting = lever_of(kind)
             st = lambda v: {"value": v, "status": "measured" if v is not None else "n/a"}
             out_json.append({
-                "name": name, "pool": ROLE.get(g, g), "authority": "operator", "setting": setting,
+                "name": name, "pool": g, "authority": "operator", "setting": setting,
                 "at_load": {"rate_rps": rate, "pool_busy_frac": row["busy_frac"],
                             "tier_mix": {"premium": 0.333, "standard": 0.333, "flex": 0.334}, "status": "measured"},
                 "source_hardware": {"ref": a.hardware_ref, "event": ev["event"]},
@@ -191,11 +204,11 @@ def main():
         json.dump(out_json, f, indent=1, default=lambda x: None if isinstance(x, float) and math.isnan(x) else x)
 
     fmt = lambda v, n=1: "-" if v is None or (isinstance(v, float) and (math.isnan(v) or math.isinf(v))) else f"{v:.{n}f}"
-    print(f"{'ev':5s} {'kind':11s} {'rps':>3s} {'pool':7s} {'Pbase':>6s} {'Phold':>6s} {'depth':>6s} {'speed':>6s} "
+    print(f"{'ev':5s} {'kind':16s} {'rps':>3s} {'pool':7s} {'Pbase':>6s} {'Phold':>6s} {'depth':>6s} {'speed':>6s} "
           f"{'dur':>7s} {'dTTFTprem':>9s} {'flexSrv':>7s} {'recov':>6s} {'rec90':>6s} {'rebnd':>6s}")
     for r in out_rows:
         dur = fmt(r["duration_s"], 0) + ("+" if r["duration_bound"] == "lower" else "")
-        print(f"{r['event']:5s} {r['kind']:11s} {r['rate']:3g} {r['pool']:7s} {r['P_base_w']:6.1f} {r['P_hold_w']:6.1f} "
+        print(f"{r['event']:5s} {r['kind']:16s} {r['rate']:3g} {r['pool']:7s} {r['P_base_w']:6.1f} {r['P_hold_w']:6.1f} "
               f"{r['depth_frac']:6.3f} {fmt(r['speed_s'], 2):>6s} {dur:>7s} {fmt(r['d_ttft_p99_prem_ms'], 0):>9s} "
               f"{fmt(r['flex_served_frac'], 2):>7s} {fmt(r['recovery_s'], 1):>6s} {fmt(r['recovery90_s'], 1):>6s} {fmt(r['rebound_frac'], 3):>6s}")
     print(f"wrote {a.dir}/e3_rows.csv and e3_rows.json   ('+' on duration = lower bound: no SLO broke in the hold)")

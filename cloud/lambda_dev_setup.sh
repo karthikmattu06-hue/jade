@@ -49,13 +49,20 @@ sudo -n nvidia-smi -pm 1 >/dev/null
 
 echo "=== 3. code + environment ==="
 [ -d "$REPO/.git" ] && git -C "$REPO" pull --ff-only || git clone https://github.com/karthikmattu06-hue/jade.git "$REPO"
-# A venv (virtual environment) is a private folder of Python packages. The
-# Lambda image ships its own torch; installing vLLM system-wide could clash
-# with it, so vLLM gets its own folder and brings the torch it was built for.
-[ -d "$VENV" ] || python3 -m venv "$VENV"
+# A venv (virtual environment) is a private folder of Python packages, so vLLM
+# and the torch it was built for do not clash with the image's own torch.
+# PYTHON 3.12 IS REQUIRED: vLLM 0.28's flashinfer dependency uses syntax that
+# crashes on 3.10 (found 10 Nov: "TypeError: 'type' object is not subscriptable").
+# SPORC's Jade env is 3.12 too. Ubuntu 22.04 ships 3.10, so we use uv, an
+# installer that downloads its own Python and is much faster than pip.
+command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+[ -x "$VENV/bin/python" ] && "$VENV/bin/python" -c 'import sys; sys.exit(sys.version_info[:2] != (3, 12))' \
+  || { rm -rf "$VENV"; uv venv --python 3.12 "$VENV"; }
 source "$VENV/bin/activate"
-pip install -q -U pip
-pip install -q "vllm==$VLLM_VERSION" nixl matplotlib      # nixl = the KV-transfer library (wraps UCX)
+uv pip install -q "vllm==$VLLM_VERSION" nixl matplotlib   # nixl = the KV-transfer library (wraps UCX)
+# flashinfer.comm is the import that failed on 3.10 -- test it here, not after a 5-minute server start.
+python -c "import flashinfer.comm"
 python -c "import vllm, nixl, pynvml, aiohttp; print('vllm', vllm.__version__, '| nixl, pynvml, aiohttp import ok')"
 
 echo "=== 4. proxy script, trace, model ==="
