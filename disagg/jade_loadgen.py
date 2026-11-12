@@ -75,6 +75,19 @@ REQ_COLS = ["rate", "i", "tier", "prompt_tokens", "out_req", "out_got", "t_sched
             "t_first", "t_end", "lag_ms", "ttft_ms", "tpot_ms", "status", "err"]
 
 
+def raise_fd_limit():
+    """Lift this process's open-file limit to the hard maximum.
+    Every in-flight or HELD request is an open socket. Linux's default soft
+    limit is 1024, and on 11 Nov a defer event at 24 req/s held ~960 requests
+    at once: the client and proxy ran out of sockets ("Too many open files")
+    and three of four pairs crashed. Raising the soft limit needs no root."""
+    import resource
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    want = hard if hard != resource.RLIM_INFINITY else 1_048_576
+    if soft < want:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (want, hard))
+
+
 class RowSink(list):
     """A list that ALSO streams every appended row to a CSV file as it arrives.
 
@@ -260,6 +273,7 @@ async def main_async(a):
 
 
 def main():
+    raise_fd_limit()
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", required=True, help="host:port to load (the proxy, for disaggregated)")
     ap.add_argument("--model", required=True)

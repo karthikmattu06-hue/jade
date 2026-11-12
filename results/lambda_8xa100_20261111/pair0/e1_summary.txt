@@ -1,0 +1,70 @@
+trace: 19366 requests; median prompt 1020 tok, median output 129 tok; tier mix [1, 1, 1]
+  phase idle_pre       30.0 s
+  phase rate_0.5       60.0 s
+  phase tail_0.5        0.0 s
+    33 requests, 1 clipped, 0 cut at tail limit
+  phase gap_0.5        15.0 s
+  phase rate_1         60.0 s
+  phase tail_1          0.0 s
+    59 requests, 2 clipped, 0 cut at tail limit
+  phase gap_1          15.0 s
+  phase rate_2         60.0 s
+  phase tail_2          0.4 s
+    113 requests, 6 clipped, 0 cut at tail limit
+  phase gap_2          15.0 s
+  phase rate_4         60.0 s
+  phase tail_4          0.7 s
+    251 requests, 10 clipped, 0 cut at tail limit
+  phase gap_4          15.0 s
+  phase rate_8         60.0 s
+  phase tail_8          1.8 s
+    505 requests, 32 clipped, 0 cut at tail limit
+  phase gap_8          15.0 s
+  phase rate_16        60.0 s
+  phase tail_16         2.0 s
+    931 requests, 46 clipped, 0 cut at tail limit
+  phase gap_16         15.0 s
+  phase rate_24        60.0 s
+  phase tail_24         2.5 s
+    1469 requests, 71 clipped, 0 cut at tail limit
+  phase gap_24         15.0 s
+  phase rate_32        60.0 s
+  phase tail_32         6.9 s
+    1971 requests, 92 clipped, 0 cut at tail limit
+  phase gap_32         15.0 s
+  phase idle_post      30.0 s
+
+ rate tier         n   ok%  TTFT p50  TTFT p99  TPOT p50  TPOT p99  lag max   (ms)
+  0.5 premium      8 100.0      49.7      63.7      4.54      5.00      5.2
+  0.5 standard    12 100.0      48.2      68.7      4.44      4.69      2.9
+  0.5 flex        13 100.0      45.6      56.7      4.52      5.08      3.0
+  0.5 all         33 100.0      49.3      68.7      4.53      5.08      5.2
+    1 premium     19 100.0      79.2     184.3      4.36      4.76     12.0
+    1 standard    16 100.0      86.2     208.2      4.53      4.75      2.8
+    1 flex        24 100.0      72.1     101.5      4.47      4.86      2.2
+    1 all         59 100.0      75.9     208.2      4.43      4.86     12.0
+    2 premium     43 100.0      69.5     182.5      4.40      4.84      2.2
+    2 standard    32 100.0      81.2     182.2      4.39      4.69      1.9
+    2 flex        38 100.0      75.6     191.3      4.39      4.97      2.9
+    2 all        113 100.0      74.2     183.6      4.40      4.84      2.9
+    4 premium     79 100.0      80.3     202.5      4.52      5.18      8.0
+    4 standard    91 100.0      79.4     192.3      4.51      5.29      3.8
+    4 flex        81 100.0      80.8     188.0      4.51      5.05      2.3
+    4 all        251 100.0      79.7     192.3      4.51      5.14      8.0
+    8 premium    167 100.0      84.4     220.7      4.93      6.10      3.7
+    8 standard   151 100.0      86.6     306.5      4.88      5.91      4.0
+    8 flex       187 100.0      84.4     201.2      4.91      7.44      3.2
+    8 all        505 100.0      85.1     220.7      4.91      6.28      4.0
+   16 premium    329 100.0     104.6     244.8      6.17      8.68     19.7
+   16 standard   295 100.0     104.0     249.2      6.14      8.69      2.6
+   16 flex       307 100.0     103.3     225.5      6.17      8.47      2.7
+   16 all        931 100.0     104.3     244.8      6.17      8.68     19.7
+   24 premium    522 100.0     160.7     468.2      8.67     11.83      4.1
+   24 standard   485 100.0     156.0     396.3      8.57     12.18      4.8
+   24 flex       462 100.0     152.6     410.6      8.69     12.14      4.1
+   24 all       1469 100.0     157.6     413.8      8.62     12.11      4.8
+   32 premium    692 100.0     368.5    7642.8     13.85     39.18      5.0
+   32 standard   647 100.0     384.1    8063.9     13.82     42.22     15.2
+   32 flex       632 100.0     389.9    7548.0     13.86     34.89      4.9
+   32 all       1971 100.0     383.1    7642.8     13.85     39.97     15.2
+wrote /home/ubuntu/jade_runs/session_20261111_1829/pair0/e1/e1_phases.csv and e1_requests.csv

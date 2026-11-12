@@ -1,0 +1,27 @@
+t_send,t_done,gpu,args,rc,output,note
+1794424523.6710,1794424523.9223,2,-pl 400,0,Power limit for GPU 00000000:08:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 start
+1794424523.9224,1794424524.1741,2,-rgc,0,All done.,e3 start
+1794424524.1742,1794424524.3901,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 start
+1794424524.3901,1794424524.5871,3,-rgc,0,All done.,e3 start
+1794424620.9818,1794424621.1516,3,-pl 300,0,Power limit for GPU 00000000:09:00.0 was set to 300.00 W from 400.00 W. | All done.,ev01 start cap_decode_300 @ 8 rps
+1794424740.9824,1794424741.1228,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 300.00 W. | All done.,ev01 release
+1794424894.2650,1794424894.4362,3,-pl 225,0,Power limit for GPU 00000000:09:00.0 was set to 225.00 W from 400.00 W. | All done.,ev02 start cap_decode_225 @ 8 rps
+1794425014.2651,1794425014.4173,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 225.00 W. | All done.,ev02 release
+1794425169.0121,1794425169.1687,3,-pl 150,0,Power limit for GPU 00000000:09:00.0 was set to 150.00 W from 400.00 W. | All done.,ev03 start cap_decode_150 @ 8 rps
+1794425289.0123,1794425289.1729,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 150.00 W. | All done.,ev03 release
+1794425444.6816,1794425444.8767,3,-pl 300,0,Power limit for GPU 00000000:09:00.0 was set to 300.00 W from 400.00 W. | All done.,ev04 start cap_decode_300 @ 16 rps
+1794425564.6817,1794425564.8614,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 300.00 W. | All done.,ev04 release
+1794425720.1143,1794425720.3429,3,-pl 225,0,Power limit for GPU 00000000:09:00.0 was set to 225.00 W from 400.00 W. | All done.,ev05 start cap_decode_225 @ 16 rps
+1794425840.1155,1794425840.3057,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 225.00 W. | All done.,ev05 release
+1794425995.6601,1794425995.8704,3,-pl 150,0,Power limit for GPU 00000000:09:00.0 was set to 150.00 W from 400.00 W. | All done.,ev06 start cap_decode_150 @ 16 rps
+1794426115.6604,1794426115.8939,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 150.00 W. | All done.,ev06 release
+1794426272.1907,1794426272.3988,3,-pl 300,0,Power limit for GPU 00000000:09:00.0 was set to 300.00 W from 400.00 W. | All done.,ev07 start cap_decode_300 @ 24 rps
+1794426392.1907,1794426392.3602,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 300.00 W. | All done.,ev07 release
+1794426549.8929,1794426550.0573,3,-pl 225,0,Power limit for GPU 00000000:09:00.0 was set to 225.00 W from 400.00 W. | All done.,ev08 start cap_decode_225 @ 24 rps
+1794426669.8932,1794426670.0508,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 225.00 W. | All done.,ev08 release
+1794426826.8028,1794426826.9679,3,-pl 150,0,Power limit for GPU 00000000:09:00.0 was set to 150.00 W from 400.00 W. | All done.,ev09 start cap_decode_150 @ 24 rps
+1794426946.8026,1794426946.9539,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 150.00 W. | All done.,ev09 release
+1794427069.4685,1794427069.6060,2,-pl 400,0,Power limit for GPU 00000000:08:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 end (finally)
+1794427069.6061,1794427069.7569,2,-rgc,0,All done.,e3 end (finally)
+1794427069.7570,1794427069.9062,3,-pl 400,0,Power limit for GPU 00000000:09:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 end (finally)
+1794427069.9063,1794427070.0554,3,-rgc,0,All done.,e3 end (finally)

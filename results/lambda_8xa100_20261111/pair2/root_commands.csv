@@ -1,0 +1,21 @@
+t_send,t_done,gpu,args,rc,output,note
+1794424523.6277,1794424523.8385,4,-pl 400,0,Power limit for GPU 00000000:0A:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 start
+1794424523.8386,1794424524.0758,4,-rgc,0,All done.,e3 start
+1794424524.0758,1794424524.2788,5,-pl 400,0,Power limit for GPU 00000000:0B:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 start
+1794424524.2788,1794424524.5202,5,-rgc,0,All done.,e3 start
+1794424619.6810,1794424619.8503,4,"-lgc 1100,1100",0,"GPU clocks set to ""(gpuClkMin 1100, gpuClkMax 1100)"" for GPU 00000000:0A:00.0 | All done.",ev01 start clock_prefill_1100 @ 8 rps
+1794424739.6809,1794424739.8078,4,-rgc,0,All done.,ev01 release
+1794424893.7506,1794424893.9029,4,"-lgc 810,810",0,"GPU clocks set to ""(gpuClkMin 810, gpuClkMax 810)"" for GPU 00000000:0A:00.0 | All done.",ev02 start clock_prefill_810 @ 8 rps
+1794425013.7506,1794425013.9106,4,-rgc,0,All done.,ev02 release
+1794425169.3473,1794425169.4886,4,"-lgc 1100,1100",0,"GPU clocks set to ""(gpuClkMin 1100, gpuClkMax 1100)"" for GPU 00000000:0A:00.0 | All done.",ev03 start clock_prefill_1100 @ 16 rps
+1794425289.3470,1794425289.5701,4,-rgc,0,All done.,ev03 release
+1794425444.7020,1794425444.9170,4,"-lgc 810,810",0,"GPU clocks set to ""(gpuClkMin 810, gpuClkMax 810)"" for GPU 00000000:0A:00.0 | All done.",ev04 start clock_prefill_810 @ 16 rps
+1794425564.7007,1794425564.8987,4,-rgc,0,All done.,ev04 release
+1794425720.9111,1794425721.0396,4,"-lgc 1100,1100",0,"GPU clocks set to ""(gpuClkMin 1100, gpuClkMax 1100)"" for GPU 00000000:0A:00.0 | All done.",ev05 start clock_prefill_1100 @ 24 rps
+1794425840.9115,1794425841.1446,4,-rgc,0,All done.,ev05 release
+1794425997.6412,1794425997.8979,4,"-lgc 810,810",0,"GPU clocks set to ""(gpuClkMin 810, gpuClkMax 810)"" for GPU 00000000:0A:00.0 | All done.",ev06 start clock_prefill_810 @ 24 rps
+1794426117.6408,1794426117.8645,4,-rgc,0,All done.,ev06 release
+1794426239.9175,1794426240.0555,4,-pl 400,0,Power limit for GPU 00000000:0A:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 end (finally)
+1794426240.0556,1794426240.2739,4,-rgc,0,All done.,e3 end (finally)
+1794426240.2739,1794426240.4473,5,-pl 400,0,Power limit for GPU 00000000:0B:00.0 was set to 400.00 W from 400.00 W. | All done.,e3 end (finally)
+1794426240.4474,1794426240.6297,5,-rgc,0,All done.,e3 end (finally)

@@ -1,0 +1,9 @@
+  ev01 cap_prefill_300 8 rps | premium p99 TTFT base      204 hold      204 after      220 ms | flex in hold: 350/350 served | 0 cut
+  ev02 cap_prefill_225 8 rps | premium p99 TTFT base      220 hold      245 after      207 ms | flex in hold: 324/324 served | 0 cut
+  ev03 cap_prefill_150 8 rps | premium p99 TTFT base      220 hold      321 after      211 ms | flex in hold: 333/333 served | 0 cut
+  ev04 cap_prefill_300 16 rps | premium p99 TTFT base      277 hold      269 after      260 ms | flex in hold: 634/634 served | 0 cut
+  ev05 cap_prefill_225 16 rps | premium p99 TTFT base      256 hold      277 after      226 ms | flex in hold: 679/679 served | 0 cut
+  ev06 cap_prefill_150 16 rps | premium p99 TTFT base      263 hold      666 after      240 ms | flex in hold: 609/609 served | 0 cut
+  ev07 cap_prefill_300 24 rps | premium p99 TTFT base      334 hold      314 after      317 ms | flex in hold: 900/900 served | 0 cut
+  ev08 cap_prefill_225 24 rps | premium p99 TTFT base      324 hold      435 after      326 ms | flex in hold: 977/977 served | 0 cut
+  ev09 cap_prefill_150 24 rps | premium p99 TTFT base      404 hold     2946 after      379 ms | flex in hold: 982/983 served | 0 cut

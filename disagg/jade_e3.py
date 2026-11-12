@@ -52,7 +52,7 @@ import argparse, asyncio, csv, os, sys, time
 import aiohttp
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from jade_loadgen import Clock, RowSink, load_trace, make_specs, one_request, pct, write_phases  # noqa: E402
+from jade_loadgen import Clock, RowSink, load_trace, make_specs, one_request, pct, raise_fd_limit, write_phases  # noqa: E402
 
 REQ_COLS = ["event", "kind", "rate", "i", "tier", "prompt_tokens", "out_req", "out_got", "t_sched", "t_send",
             "t_first", "t_end", "lag_ms", "ttft_ms", "tpot_ms", "status", "err"]
@@ -268,6 +268,7 @@ def main():
     ap.add_argument("--timeout-s", type=float, default=300.0)
     ap.add_argument("--seed", type=int, default=650)
     ap.add_argument("--out-dir", default=".")
+    raise_fd_limit()
     asyncio.run(main_async(ap.parse_args()))
 
 

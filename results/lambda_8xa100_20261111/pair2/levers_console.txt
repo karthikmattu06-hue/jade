@@ -1,0 +1,6 @@
+  ev01 clock_prefill_1100 8 rps | premium p99 TTFT base      216 hold      218 after      264 ms | flex in hold: 340/340 served | 0 cut
+  ev02 clock_prefill_810 8 rps | premium p99 TTFT base      212 hold      267 after      223 ms | flex in hold: 356/356 served | 0 cut
+  ev03 clock_prefill_1100 16 rps | premium p99 TTFT base      266 hold      301 after      297 ms | flex in hold: 673/673 served | 0 cut
+  ev04 clock_prefill_810 16 rps | premium p99 TTFT base      258 hold      354 after      241 ms | flex in hold: 638/638 served | 0 cut
+  ev05 clock_prefill_1100 24 rps | premium p99 TTFT base      494 hold      444 after      345 ms | flex in hold: 990/990 served | 0 cut
+  ev06 clock_prefill_810 24 rps | premium p99 TTFT base      359 hold      761 after      286 ms | flex in hold: 957/957 served | 0 cut

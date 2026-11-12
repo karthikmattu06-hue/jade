@@ -33,6 +33,9 @@
 #  NEEDS: lambda_dev_setup.sh run first on this VM.
 # ======================================================================
 set -uo pipefail
+# Each held or in-flight request is an open socket; the default limit (1024) broke the
+# 24 req/s defer events on 11 Nov. Raise it for everything started from this shell.
+ulimit -n "$(ulimit -Hn)" 2>/dev/null || ulimit -n 65536 2>/dev/null || true
 
 REPO=~/jade; WORK="$REPO/disagg"; DATA=~/jade_data
 source ~/jade-venv/bin/activate

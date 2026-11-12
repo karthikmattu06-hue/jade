@@ -1,0 +1,10 @@
+  ev01 shed_reject 4 rps | premium p99 TTFT base      203 hold      194 after      191 ms | flex in hold: 0/175 served | 0 cut
+  ev02 shed_defer  4 rps | premium p99 TTFT base      207 hold      189 after     3183 ms | flex in hold: 163/163 served | 0 cut
+  ev03 shed_defer_ramp 4 rps | premium p99 TTFT base      203 hold      202 after      298 ms | flex in hold: 166/166 served | 0 cut
+  ev04 drain       4 rps | premium p99 TTFT base      207 hold      nan after      202 ms | flex in hold: 0/150 served | 0 cut
+  ev05 shed_reject 8 rps | premium p99 TTFT base      203 hold      197 after      216 ms | flex in hold: 0/326 served | 0 cut
+  ev06 shed_defer  8 rps | premium p99 TTFT base      208 hold      216 after      inf ms | flex in hold: 316/316 served | 0 cut
+  ev07 shed_defer_ramp 8 rps | premium p99 TTFT base      220 hold      213 after      224 ms | flex in hold: 311/311 served | 0 cut
+  ev08 drain       8 rps | premium p99 TTFT base      228 hold      nan after      212 ms | flex in hold: 0/336 served | 0 cut
+  ev09 shed_reject 24 rps | premium p99 TTFT base      350 hold      270 after      323 ms | flex in hold: 0/966 served | 0 cut
+  ev10 shed_defer  24 rps | premium p99 TTFT base      324 hold      256 after     2396 ms | flex in hold: 75/896 served | 0 cut

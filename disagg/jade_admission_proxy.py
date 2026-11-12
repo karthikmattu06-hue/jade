@@ -190,6 +190,10 @@ async def on_cleanup(app):
 
 
 def main():
+    import resource                    # held requests = open sockets; see jade_loadgen.raise_fd_limit
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if soft < hard:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (hard, hard))
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8300)
     ap.add_argument("--upstream", default="localhost:8192", help="host:port of the vLLM toy proxy")

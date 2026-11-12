@@ -1,0 +1,6 @@
+  ev01 clock_decode_1100 8 rps | premium p99 TTFT base      202 hold      240 after      268 ms | flex in hold: 328/328 served | 0 cut
+  ev02 clock_decode_810 8 rps | premium p99 TTFT base      237 hold      222 after      265 ms | flex in hold: 307/307 served | 0 cut
+  ev03 clock_decode_1100 16 rps | premium p99 TTFT base      256 hold      255 after      248 ms | flex in hold: 651/651 served | 0 cut
+  ev04 clock_decode_810 16 rps | premium p99 TTFT base      264 hold      278 after      284 ms | flex in hold: 581/581 served | 0 cut
+  ev05 clock_decode_1100 24 rps | premium p99 TTFT base      386 hold      412 after      368 ms | flex in hold: 930/930 served | 0 cut
+  ev06 clock_decode_810 24 rps | premium p99 TTFT base      360 hold      477 after      492 ms | flex in hold: 914/914 served | 0 cut
